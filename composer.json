@@ -10,6 +10,8 @@
         "optimize-autoloader": true
     },
     "require": {
-        "symfony/routing": "^3.4"
+        "symfony/routing": "^3.4",
+        "mongodb/mongodb": "^1.2",
+        "symfony/dotenv": "^3.4"
     }
 }
