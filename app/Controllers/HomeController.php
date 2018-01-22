@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Request;
 use App\Response;
+use App\Databases\MongoClient;
 
 class HomeController
 {
@@ -17,5 +18,14 @@ class HomeController
         $out = 'Test path called via "' . $request->base . '"!';
 
         Response::send($out);
+    }
+
+    public function load(Request $request)
+    {
+        $client = new MongoClient('dockable', 'sources');
+
+        $sources = $client->find()->all();
+
+        Response::send($sources);
     }
 }

@@ -5,6 +5,7 @@ namespace App;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 class Router
@@ -79,7 +80,14 @@ class Router
         $context = new RequestContext('/', $request->method);
         $matcher = new UrlMatcher(self::$routes[$request->method], $context);
 
-        $parameters = $matcher->match($request->path);
+        try
+        {
+            $parameters = $matcher->match($request->path);
+        }
+        catch (ResourceNotFoundException $ex)
+        {
+            Response::send('page not found', 404);
+        }
 
         if ($parameters['_controller'])
         {
