@@ -13,12 +13,28 @@ services:
             - ./site.conf:/etc/nginx/conf.d/site.conf
         links:
             - php
+        networks:
+            - dockablenet
     php:
         build:
             context: ./docker/php
             dockerfile: Dockerfile
         image: dockable/php
+        networks:
+            - dockablenet
         volumes:
             - ./:/usr/share/nginx/html
     database:
         image: mongo:3.7.1-jessie
+        networks:
+            - dockablenet
+        volumes:
+            - dbdata:/data/db
+
+networks:
+    dockablenet:
+        driver: bridge
+
+volumes:
+    dbdata:
+        driver: local
