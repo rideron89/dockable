@@ -3,7 +3,6 @@
 use App\Router;
 
 Router::get('/', 'HomeController@index');
-Router::get('/test', 'HomeController@test');
-Router::get('/load', 'HomeController@load');
+Router::get('/sources', 'HomeController@sources');
 
-Router::post('/', 'HomeController@test');
+Router::generateRoutes('/api/sources', 'SourcesController', 'source_id');

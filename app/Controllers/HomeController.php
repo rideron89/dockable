@@ -13,14 +13,7 @@ class HomeController
         Response::view('index.html');
     }
 
-    public function test(Request $request)
-    {
-        $out = 'Test path called via "' . $request->base . '"!';
-
-        Response::send($out);
-    }
-
-    public function load(Request $request)
+    public function sources(Request $request)
     {
         $client = new MongoClient('dockable', 'sources');
 
