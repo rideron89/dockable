@@ -24,4 +24,4 @@ The intention is to have a properly developed, DBMS-agnostic approach. However, 
 
 ## License
 
-The Dockable framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Dockable framework is open-sourced software licensed under the [MIT license](https://github.com/rideron89/dockable/blob/master/COPYRIGHT).
