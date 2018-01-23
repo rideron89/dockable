@@ -12,63 +12,6 @@ use MongoDB\Driver\WriteConcern;
 use MongoDB\Driver\Exception\Exception as MongoException;
 use MongoDB\Driver\Exception\BulkWriteException;
 
-class MongoCursor
-{
-    /**
-    * List of all rows after performing any limit or filter methods.
-    *
-    * @var array
-    */
-    private $rows;
-
-    public function __construct($documents)
-    {
-        $this->rows = [];
-
-        foreach ($documents as $doc)
-        {
-            $this->rows[] = $doc;
-        }
-    }
-
-    /**
-    * Return all the rows referenced by the cursor.
-    *
-    * @return array
-    */
-    public function all()
-    {
-        return $this->rows;
-    }
-
-    /**
-    * Reduce the number of rows to a specific amount. This method returns the
-    * rows directly.
-    *
-    * @param int $count [default: 10]
-    *
-    * @return array
-    */
-    public function limit($count = 10)
-    {
-        $newRows = [];
-        $index = 0;
-
-        foreach ($this->rows as $row)
-        {
-            if ($index < $count)
-            {
-                $newRows[] = $row;
-                $index++;
-            }
-        }
-
-        $this->rows = $newRows;
-
-        return $this->rows;
-    }
-}
-
 class MongoClient extends Client
 {
     /**
