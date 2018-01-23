@@ -4,15 +4,39 @@ namespace App;
 
 class Request
 {
-    public $method = 'GET';
-    
     /**
-    * An array of all request parameters.
+    * Type of HTTP method in the request.
+    *
+    * @var string [default: 'GET']
+    */
+    public $method = 'GET';
+
+    /**
+    * A list of all route parameters found in the path.
     *
     * @var array
     */
-    private $params = [];
+    public $params = [];
 
+    /**
+    * A list of all POST parameters in the request.
+    *
+    * @var array
+    */
+    public $post = [];
+
+    /**
+    * A list of all query parameters found in the query string.
+    *
+    * @var array
+    */
+    public $query  = [];
+
+    /**
+    * Path of request URI, without the hostname.
+    *
+    * @var string [default: '/']
+    */
     public $path = '/';
 
     public function __construct()
@@ -20,13 +44,27 @@ class Request
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->path = explode('?', $_SERVER['REQUEST_URI'])[0];
 
-        $this->prepareParams();
+        if ($this->method === 'POST')
+        {
+            if ($_POST)
+            {
+                $this->post = $_POST;
+            }
+        }
+        else if ($this->method === 'PUT')
+        {
+            $putData = file_get_contents('php://input');
+
+            $this->post = json_decode($putData, true);
+        }
+
+        $this->parseQueryParams();
     }
 
     /**
     * Extract the request parameters and parse them into the $params property.
     */
-    private function prepareParams()
+    private function parseQueryParams()
     {
         if (isset($_GET))
         {
@@ -39,22 +77,5 @@ class Request
         {
             Response::send('not implemented yet', 501);
         }
-    }
-
-    /**
-    * Retrieve either all params or a specific param by key.
-    *
-    * @param string $key [default: null]
-    *
-    * @return array/string
-    */
-    public function params($key = null)
-    {
-        if ($key === null)
-        {
-            return $this->params;
-        }
-
-        return $this->params[$key];
     }
 }
