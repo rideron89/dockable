@@ -37,7 +37,7 @@ class Router
             array(),                            // options
             '',                                 // host
             array(),                            // schemes
-            array($method)                        // methods
+            array($method)                      // methods
         );
 
         if (!self::$routes[$method])
@@ -49,7 +49,7 @@ class Router
     }
 
     /**
-    * Add a new route configuration for a specific PATH to the GET collection.
+    * Add a new route configuration for the GET method.
     *
     * @param string $path
     * @param string $controller
@@ -60,7 +60,7 @@ class Router
     }
 
     /**
-    * Add a new route configuration for a specific PATH to the POST collection.
+    * Add a new route configuration for the POST method.
     *
     * @param string $path
     * @param string $controller
@@ -68,6 +68,68 @@ class Router
     public static function post($path, $controller)
     {
         self::addRoute($path, $controller, 'POST');
+    }
+
+    /**
+    * Add a new route configuration for the PUT method.
+    *
+    * @param string $path
+    * @param string $controller
+    */
+    public static function put($path, $controller)
+    {
+        self::addRoute($path, $controller, 'PUT');
+    }
+
+    /**
+    * Add a new route configuration for the DELETE method.
+    *
+    * @var string $path
+    * @var string $controller
+    */
+    public static function delete($path, $controller)
+    {
+        self::addRoute($path, $controller, 'DELETE');
+    }
+
+    /**
+    * Generate a complete (or partial) set of route collections for a specific
+    * end-point base.
+    *
+    * @param string $base
+    * @param string $controller
+    * @param string $param
+    * @param array $methods [default: ['GET', 'POST', 'PUT', 'DELETE']]
+    */
+    public static function generateRoutes($base, $controller, $param, $methods = ['GET', 'POST', 'PUT', 'DELETE'])
+    {
+        if (in_array('GET', $methods))
+        {
+            if (!in_array('GET-SINGLE', $methods))
+            {
+                self::addRoute($base, "$controller@index", 'GET');
+            }
+
+            if (!in_array('GET-ALL', $methods))
+            {
+                self::addRoute("$base/{{$param}}", "$controller@single", 'GET');
+            }
+        }
+
+        if (in_array('POST', $methods))
+        {
+            self::addRoute($base, "$controller@create", 'POST');
+        }
+
+        if (in_array('PUT', $methods))
+        {
+            self::addRoute("$base/{{$param}}", "$controller@update", 'PUT');
+        }
+
+        if (in_array('DELETE', $methods))
+        {
+            self::addRoute("$base/{{$param}}", "$controller@delete", 'DELETE');
+        }
     }
 
     /**
@@ -82,17 +144,29 @@ class Router
 
         try
         {
-            $parameters = $matcher->match($request->path);
+            $match = $matcher->match($request->path);
+
+            // get route parameters
+            $paramMatches = [];
+            preg_match('/{(\S+)}/', $match['_route'], $paramMatches);
+
+            // first item is the full match, so remove it
+            array_shift($paramMatches);
+
+            foreach ($paramMatches as $param)
+            {
+                $request->params[$param] = $match[$param];
+            }
         }
         catch (ResourceNotFoundException $ex)
         {
             Response::send('page not found', 404);
         }
 
-        if ($parameters['_controller'])
+        if ($match['_controller'])
         {
             // expect _controller to look like 'ClassName@methodName'
-            $split = explode('@', $parameters['_controller']);
+            $split = explode('@', $match['_controller']);
 
             if (count($split) < 2)
             {
@@ -104,7 +178,7 @@ class Router
             $className  = 'App\\Controllers\\' . $controller;
 
             $instance = new $className();
-            $instance->$method($request);
+            $instance->$method($request, $params);
         }
     }
 }
