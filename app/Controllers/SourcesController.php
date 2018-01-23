@@ -19,9 +19,14 @@ class SourcesController
     {
         $client = new MongoClient('dockable', 'sources');
 
-        $sources = $client->find()->all();
+        $result = $client->find();
 
-        Response::send($sources);
+        if ($result->err)
+        {
+            Response::send($result->err, 500);
+        }
+
+        Response::send($result->results);
     }
 
     /**
@@ -29,15 +34,20 @@ class SourcesController
     *
     * @param App\Request $request
     */
-    public function single(Request $request)
+    public function read(Request $request)
     {
-        $id = new ObjectId($request->params['source_id']);
-
         $client = new MongoClient('dockable', 'sources');
 
-        $document = $client->find(['_id' => $id])->all();
+        $id = new ObjectId($request->params['source_id']);
 
-        Response::send($document);
+        $result = $client->find(['_id' => $id]);
+
+        if ($result->err)
+        {
+            Response::send($result->err, 500);
+        }
+
+        Response::send($result->results[0]);
     }
 
     /**
@@ -49,9 +59,14 @@ class SourcesController
     {
         $client = new MongoClient('dockable', 'sources');
 
-        $client->create($request->post);
+        $result = $client->create($request->post);
 
-        Response::send($request->post);
+        if ($result->err)
+        {
+            Response::send($result->err, 500);
+        }
+
+        Response::send($result->results);
     }
 
     /**
@@ -66,7 +81,12 @@ class SourcesController
 
         $client = new MongoClient('dockable', 'sources');
 
-        $client->update(['_id' => $id], $document);
+        $result = $client->update(['_id' => $id], $document);
+
+        if ($result->err)
+        {
+            Response::send($result->err, 500);
+        }
 
         Response::send($document);
     }
@@ -82,7 +102,12 @@ class SourcesController
 
         $client = new MongoClient('dockable', 'sources');
 
-        $client->delete(['_id' => $id]);
+        $result = $client->delete(['_id' => $id]);
+
+        if ($result->err)
+        {
+            Response::send($result->err, 500);
+        }
 
         Response::send('deleted "' . $request->params['source_id'] . '"');
     }

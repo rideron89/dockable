@@ -4,6 +4,8 @@ namespace App\Databases;
 
 use App\Response;
 
+use App\Databases\Result as DatabaseResult;
+
 use MongoDB\Driver\Command;
 use MongoDB\Driver\Manager as MongoDriver;
 use MongoDB\Driver\BulkWrite;
@@ -34,7 +36,7 @@ class MongoClient extends Client
     *
     * @return MongoDB\Driver\Manager
     */
-    private function connect()
+    private function _connect()
     {
         $connection = new MongoDriver('mongodb://' . $this->dbHost . ':' . $this->dbPort);
 
@@ -47,24 +49,29 @@ class MongoClient extends Client
     * @param array $filter
     * @param array $options
     *
-    * @return MongoCursor
+    * @return App\Databases\Result
     */
     public function find($filter = [], $options = [])
     {
-        $rows = [];
+        $documents = [];
 
         try
         {
-            $connection = $this->connect();
+            $connection = $this->_connect();
 
             $query = new Query($filter, $options);
             $cursor = $connection->executeQuery($this->collectionString, $query);
 
-            return new MongoCursor($cursor);
+            foreach ($cursor as $doc)
+            {
+                array_push($documents, (array)$doc);
+            }
+
+            return new DatabaseResult($documents);
         }
         catch (MongoException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
     }
 
@@ -72,26 +79,30 @@ class MongoClient extends Client
     * Create a document from POST data.
     *
     * @param array $document
+    *
+    * @return App\Databases\DatabaseResult
     */
     public function create($document)
     {
         try
         {
-            $connection = $this->connect();
+            $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
             $bulk = new BulkWrite();
-            $bulk->insert($document);
+            $newId = $bulk->insert($document);
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
+
+            return new DatabaseResult(['id' => $newId]);
         }
         catch (MongoException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
         catch (BulkWriteException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
     }
 
@@ -100,26 +111,30 @@ class MongoClient extends Client
     *
     * @var array $filter
     * @var array $document
+    *
+    * @return App\Databases\Result
     */
     public function update($filter, $document)
     {
         try
         {
-            $connection = $this->connect();
+            $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
             $bulk = new BulkWrite();
             $bulk->update($filter, ['$set' => $document]);
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
+
+            return new DatabaseResult($document);
         }
         catch (MongoException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
         catch (BulkWriteException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
     }
 
@@ -127,26 +142,30 @@ class MongoClient extends Client
     * Delete documents based on a filter.
     *
     * @var array $filter
+    *
+    * @return App\Databases\DatabaseResult
     */
     public function delete($filter)
     {
         try
         {
-            $connection = $this->connect();
+            $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
             $bulk = new BulkWrite();
             $bulk->delete($filter);
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
+
+            return new DatabaseResult($filter);
         }
         catch (MongoException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
         catch (BulkWriteException $e)
         {
-            Response::send($e->getMessage(), 500);
+            return new DatabaseResult(null, $e->getMessage());
         }
     }
 }

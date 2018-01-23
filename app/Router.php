@@ -112,7 +112,7 @@ class Router
 
             if (!in_array('GET-ALL', $methods))
             {
-                self::addRoute("$base/{{$param}}", "$controller@single", 'GET');
+                self::addRoute("$base/{{$param}}", "$controller@read", 'GET');
             }
         }
 
