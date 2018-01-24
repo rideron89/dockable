@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Routing\Router;
+
 class Application
 {
     public $request;

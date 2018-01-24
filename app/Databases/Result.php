@@ -16,7 +16,7 @@ class Result
     *
     * @var array
     */
-    public $results;
+    public $documents;
 
     /**
     * The number of results returned by the database operation.
@@ -27,7 +27,7 @@ class Result
 
     public function __construct($results, $error = false)
     {
-        $this->results = $results;
+        $this->documents = $results;
         $this->count = count($results);
 
         $this->error = $error;

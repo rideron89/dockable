@@ -26,7 +26,7 @@ class SourcesController
             Response::send($result->err, 500);
         }
 
-        Response::send($result->results);
+        Response::send($result->documents);
     }
 
     /**
@@ -47,7 +47,7 @@ class SourcesController
             Response::send($result->err, 500);
         }
 
-        Response::send($result->results[0]);
+        Response::send($result->documents[0]);
     }
 
     /**
@@ -66,7 +66,7 @@ class SourcesController
             Response::send($result->err, 500);
         }
 
-        Response::send($result->results);
+        Response::send($result->documents);
     }
 
     /**
