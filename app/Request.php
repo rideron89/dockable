@@ -39,10 +39,14 @@ class Request
     */
     public $path = '/';
 
+    public $originalRequest = [];
+
     public function __construct()
     {
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->path = explode('?', $_SERVER['REQUEST_URI'])[0];
+
+        $this->originalRequest = $_SERVER;
 
         if ($this->method === 'POST')
         {
