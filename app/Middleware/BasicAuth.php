@@ -11,8 +11,8 @@ class BasicAuth implements Middleware
 {
     public static function run(Request $request)
     {
-        $user = $request->originalRequest['PHP_AUTH_USER'];
-        $pass = $request->originalRequest['PHP_AUTH_PW'];
+        $user = trim($request->originalRequest['PHP_AUTH_USER']);
+        $pass = trim($request->originalRequest['PHP_AUTH_PW']);
 
         if (!$user || !$pass)
         {
