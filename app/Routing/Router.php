@@ -1,12 +1,15 @@
 <?php
 
-namespace App;
+namespace App\Routing;
 
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+
+use App\Request;
+use App\Response;
+use App\Middleware\Middleware;
 
 class Router
 {
@@ -25,10 +28,12 @@ class Router
     * @param string $path
     * @param string $controller
     * @param string $method [default: 'GET']
+    *
+    * @return App\Routing\EnhancedRoute
     */
     public static function addRoute($path, $controller, $method = 'GET')
     {
-        $route = new Route(
+        $route = new EnhancedRoute(
             $path,                              // path
             array(                              // default values
                 '_controller' => $controller,
@@ -46,6 +51,8 @@ class Router
         }
 
         self::$routes[$method]->add($path, $route);
+
+        return $route;
     }
 
     /**
@@ -53,10 +60,12 @@ class Router
     *
     * @param string $path
     * @param string $controller
+    *
+    * @return App\Routing\EnhancedRoute
     */
     public static function get($path, $controller)
     {
-        self::addRoute($path, $controller, 'GET');
+        return self::addRoute($path, $controller, 'GET');
     }
 
     /**
@@ -64,10 +73,12 @@ class Router
     *
     * @param string $path
     * @param string $controller
+    *
+    * @return App\Routing\EnhancedRoute
     */
     public static function post($path, $controller)
     {
-        self::addRoute($path, $controller, 'POST');
+        return self::addRoute($path, $controller, 'POST');
     }
 
     /**
@@ -75,10 +86,12 @@ class Router
     *
     * @param string $path
     * @param string $controller
+    *
+    * @return App\Routing\EnhancedRoute
     */
     public static function put($path, $controller)
     {
-        self::addRoute($path, $controller, 'PUT');
+        return self::addRoute($path, $controller, 'PUT');
     }
 
     /**
@@ -86,50 +99,12 @@ class Router
     *
     * @var string $path
     * @var string $controller
+    *
+    * @return App\Routing\EnhancedRoute
     */
     public static function delete($path, $controller)
     {
-        self::addRoute($path, $controller, 'DELETE');
-    }
-
-    /**
-    * Generate a complete (or partial) set of route collections for a specific
-    * end-point base.
-    *
-    * @param string $base
-    * @param string $controller
-    * @param string $param
-    * @param array $methods [default: ['GET', 'POST', 'PUT', 'DELETE']]
-    */
-    public static function generateRoutes($base, $controller, $param, $methods = ['GET', 'POST', 'PUT', 'DELETE'])
-    {
-        if (in_array('GET', $methods))
-        {
-            if (!in_array('GET-SINGLE', $methods))
-            {
-                self::addRoute($base, "$controller@index", 'GET');
-            }
-
-            if (!in_array('GET-ALL', $methods))
-            {
-                self::addRoute("$base/{{$param}}", "$controller@read", 'GET');
-            }
-        }
-
-        if (in_array('POST', $methods))
-        {
-            self::addRoute($base, "$controller@create", 'POST');
-        }
-
-        if (in_array('PUT', $methods))
-        {
-            self::addRoute("$base/{{$param}}", "$controller@update", 'PUT');
-        }
-
-        if (in_array('DELETE', $methods))
-        {
-            self::addRoute("$base/{{$param}}", "$controller@delete", 'DELETE');
-        }
+        return self::addRoute($path, $controller, 'DELETE');
     }
 
     /**
@@ -145,22 +120,22 @@ class Router
         try
         {
             $match = $matcher->match($request->path);
-
-            // get route parameters
-            $paramMatches = [];
-            preg_match('/{(\S+)}/', $match['_route'], $paramMatches);
-
-            // first item is the full match, so remove it
-            array_shift($paramMatches);
-
-            foreach ($paramMatches as $param)
-            {
-                $request->params[$param] = $match[$param];
-            }
         }
         catch (ResourceNotFoundException $ex)
         {
-            Response::send('page not found', 404);
+            Response::send('route not found', 404);
+        }
+
+        // get route parameters
+        $paramMatches = [];
+        preg_match('/{(\S+)}/', $match['_route'], $paramMatches);
+
+        // first item is the full match, so remove it
+        array_shift($paramMatches);
+
+        foreach ($paramMatches as $param)
+        {
+            $request->params[$param] = $match[$param];
         }
 
         if ($match['_controller'])
@@ -170,15 +145,30 @@ class Router
 
             if (count($split) < 2)
             {
-                Response::send('invalid controller setup for route "' . $request->path . '"', 400);
+                Response::send('invalid controller setup for route "' . $request->path . '"', 501);
             }
 
             $controller = $split[0];
             $method     = $split[1];
             $className  = 'App\\Controllers\\' . $controller;
 
+            // run the middleware if any is set
+            if ($match['middleware'])
+            {
+                foreach ($match['middleware'] as $middleware)
+                {
+                    $middlewareClassname = 'App\\Middleware\\' . $middleware;
+
+                    $middlewareClassname::run($request);
+                }
+            }
+
             $instance = new $className();
-            $instance->$method($request, $params);
+            $instance->$method($request);
+        }
+        else
+        {
+            Response::send('no controller setup', 501);
         }
     }
 }
