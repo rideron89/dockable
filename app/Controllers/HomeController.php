@@ -11,6 +11,13 @@ class HomeController
 {
     public function index(Request $request)
     {
-        Response::view('index.html');
+        if ($request->user && $request->password)
+        {
+            Response::view('index.html');
+        }
+        else
+        {
+            Response::view('login.html');
+        }
     }
 }

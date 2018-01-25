@@ -26,3 +26,4 @@ Router::delete('/api/sources/{source_id}', 'SourcesController@delete')->middlewa
  |
  *------------------------------------------------------------*/
 Router::get('/api/auth', 'AuthController@index')->middleware(['BasicAuth']);
+Router::post('/api/login', 'AuthController@login');
