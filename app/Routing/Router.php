@@ -2,12 +2,12 @@
 
 namespace App\Routing;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
-use App\Request;
 use App\Response;
 use App\Middleware\Middleware;
 
@@ -110,16 +110,16 @@ class Router
     /**
     * Attempt to route the currect request.
     *
-    * @param App\Request $request
+    * @param Symfony\Component\HttpFoundation\Request $request
     */
     public static function route(Request $request)
     {
-        $context = new RequestContext('/', $request->method);
-        $matcher = new UrlMatcher(self::$routes[$request->method], $context);
+        $context = new RequestContext('/', $request->getMethod());
+        $matcher = new UrlMatcher(self::$routes[$request->getMethod()], $context);
 
         try
         {
-            $match = $matcher->match($request->path);
+            $match = $matcher->match($request->getPathInfo());
         }
         catch (ResourceNotFoundException $ex)
         {
@@ -145,7 +145,7 @@ class Router
 
             if (count($split) < 2)
             {
-                Response::send('invalid controller setup for route "' . $request->path . '"', 501);
+                Response::send('invalid controller setup for route "' . $request->getPathInfo() . '"', 501);
             }
 
             $controller = $split[0];

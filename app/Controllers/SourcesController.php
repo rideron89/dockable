@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Request;
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Response;
 use App\Databases\MongoClient;
 
@@ -13,7 +14,7 @@ class SourcesController
     /**
     * Return a list of all sources.
     *
-    * @param App\Request $request
+    * @param Symfony\Component\HttpFoundation\Request $request
     */
     public function index(Request $request)
     {
@@ -32,13 +33,13 @@ class SourcesController
     /**
     * Send a single source in the response, based on a route parameter.
     *
-    * @param App\Request $request
+    * @param Symfony\Component\HttpFoundation\Request $request
     */
     public function read(Request $request)
     {
-        $client = new MongoClient('dockable', 'sources');
-
         $id = new ObjectId($request->params['source_id']);
+
+        $client = new MongoClient('dockable', 'sources');
 
         $result = $client->find(['_id' => $id]);
 
@@ -47,19 +48,26 @@ class SourcesController
             Response::send($result->err, 500);
         }
 
+        if (count($result->documents) < 1)
+        {
+            Response::send('source not found', 404);
+        }
+
         Response::send($result->documents[0]);
     }
 
     /**
     * Create a new source from POST data.
     *
-    * @param App\Request $request
+    * @param Symfony\Component\HttpFoundation\Request $request
     */
     public function create(Request $request)
     {
+        $document = $request->request->all();
+
         $client = new MongoClient('dockable', 'sources');
 
-        $result = $client->create($request->post);
+        $result = $client->create($document);
 
         if ($result->err)
         {
@@ -72,13 +80,13 @@ class SourcesController
     /**
     * Update sources from PUT data.
     *
-    * @var App\Request $request
+    * @var Symfony\Component\HttpFoundation\Request $request
     */
     public function update(Request $request)
     {
-        $document = $request->post;
         $id = new ObjectId($request->params['source_id']);
-
+        $document = $request->request->all();
+        
         $client = new MongoClient('dockable', 'sources');
 
         $result = $client->update(['_id' => $id], $document);
@@ -94,7 +102,7 @@ class SourcesController
     /**
     * Delete sources from route parameters.
     *
-    * @var App\Request $request
+    * @var Symfony\Component\HttpFoundation\Request $request
     */
     public function delete(Request $request)
     {

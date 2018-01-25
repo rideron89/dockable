@@ -2,7 +2,8 @@
 
 namespace App\Middleware;
 
-use App\Request;
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Response;
 use App\Databases\MongoClient;
 use App\Databases\Result as DatabaseResult;
@@ -11,8 +12,8 @@ class BasicAuth implements Middleware
 {
     public static function run(Request $request)
     {
-        $user = trim($request->originalRequest['PHP_AUTH_USER']);
-        $pass = trim($request->originalRequest['PHP_AUTH_PW']);
+        $user = trim($request->getUser());
+        $pass = trim($request->getPassword());
 
         if (!$user || !$pass)
         {

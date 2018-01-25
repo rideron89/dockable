@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Routing\Router;
 
 class Application
@@ -12,7 +14,7 @@ class Application
     {
         include_once __DIR__ . '/../routes/web.php';
 
-        $this->request = new Request();
+        $this->request = Request::createFromGlobals();
     }
 
     /**

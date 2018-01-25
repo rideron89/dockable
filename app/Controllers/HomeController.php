@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Request;
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Response;
 use App\Databases\MongoClient;
 
