@@ -6,14 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Response;
 use App\Services\AuthenticateUserService;
+use App\Services\CookieManagerService;
 
 class AuthController
 {
-    public function index(Request $request)
-    {
-        Response::send('success');
-    }
-
     public function login(Request $request)
     {
         $username = trim($request->request->get('username'));
@@ -26,6 +22,15 @@ class AuthController
             Response::send('unauthorized', 401);
         }
 
+        CookieManagerService::add('login', "$username:$password");
+
         Response::send("Hello, $username!");
+    }
+
+    public function logout(Request $request)
+    {
+        CookieManagerService::remove('login');
+
+        Response::send('logged out');
     }
 }

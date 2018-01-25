@@ -6,18 +6,43 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Response;
 use App\Databases\MongoClient;
+use App\Services\AuthenticateUserService;
 
 class HomeController
 {
     public function index(Request $request)
     {
-        if ($request->user && $request->password)
+        $login = $request->cookies->get('login');
+
+        if (!$login)
         {
-            Response::view('index.html');
+            header('Location: /login');
+            return;
         }
-        else
+
+        $parts = explode(':', $login);
+        $username = $parts[0];
+        $password = $parts[1];
+
+        if (!$username || !$password)
         {
-            Response::view('login.html');
+            header('Location: /login');
+            return;
         }
+
+        $authorized = AuthenticateUserService::authenticate($username, $password);
+
+        if (!$authorized)
+        {
+            header('Location: /login');
+            return;
+        }
+
+        Response::view('index.html');
+    }
+
+    public function login(Request $request)
+    {
+        Response::view('login.html');
     }
 }

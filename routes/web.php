@@ -7,7 +7,8 @@ use App\Routing\Router;
  |    Front-end end-points
  |
  *------------------------------------------------------------*/
-Router::get('/', 'HomeController@index');
+Router::get('/',      'HomeController@index');
+Router::get('/login', 'HomeController@login');
 
 /*------------------------------------------------------------*
  |
@@ -25,5 +26,5 @@ Router::delete('/api/sources/{source_id}', 'SourcesController@delete')->middlewa
  |    Auth API end-points
  |
  *------------------------------------------------------------*/
-Router::get('/api/auth', 'AuthController@index')->middleware(['BasicAuth']);
-Router::post('/api/login', 'AuthController@login');
+Router::post('/api/login',  'AuthController@login');
+Router::get( '/api/logout', 'AuthController@logout');
