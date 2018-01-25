@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Response;
 use App\Databases\MongoClient;
 use App\Databases\Result as DatabaseResult;
+use App\Services\AuthenticateUserService;
 
 class BasicAuth implements Middleware
 {
@@ -15,15 +16,9 @@ class BasicAuth implements Middleware
         $user = trim($request->getUser());
         $pass = trim($request->getPassword());
 
-        if (!$user || !$pass)
-        {
-            Response::send('unauthorized', 401);
-        }
+        $authorized = AuthenticateUserService::authenticate($user, $pass);
 
-        $client = new MongoClient('dockable', 'users');
-        $results = $client->find(['username' => $user]);
-
-        if (password_verify($pass, $results->documents[0]['password']) === false)
+        if (!$authorized)
         {
             Response::send('unauthorized', 401);
         }
