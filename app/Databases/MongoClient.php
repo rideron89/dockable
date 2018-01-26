@@ -43,6 +43,41 @@ class MongoClient extends Client
     }
 
     /**
+    * Check to see if something exists in the databse. Does not return that
+    * document.
+    *
+    * TODO should probably not just return TRUE on error.
+    *
+    * @param array $filter
+    * @param array $options
+    *
+    * @return bool
+    */
+    public function exists($filter = [], $options = [])
+    {
+        $documents = [];
+
+        try
+        {
+            $connection = $this->_connect();
+
+            $query = new Query($filter, $options);
+            $cursor = $connection->executeQuery($this->collectionString, $query);
+
+            foreach ($cursor as $doc)
+            {
+                array_push($documents, (array)$doc);
+            }
+
+            return count($documents) > 0;
+        }
+        catch (MongoException $e)
+        {
+            return true;
+        }
+    }
+
+    /**
     * Find all rows for a given filter configuration.
     *
     * @param array $filter
@@ -93,7 +128,10 @@ class MongoClient extends Client
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
 
-            return new DatabaseResult(['id' => $newId]);
+            $newDocument = $document;
+            $newDocument['id'] = $newId->jsonSerialize()['$oid'];
+
+            return new DatabaseResult($newDocument);
         }
         catch (MongoException $e)
         {
