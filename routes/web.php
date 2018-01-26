@@ -28,3 +28,11 @@ Router::delete('/api/sources/{source_id}', 'SourcesController@delete')->middlewa
  *------------------------------------------------------------*/
 Router::post('/api/login',  'AuthController@login');
 Router::get( '/api/logout', 'AuthController@logout');
+
+/*------------------------------------------------------------*
+ |
+ |    Client OAuth end-points
+ |
+ *------------------------------------------------------------*/
+ Router::post('/oauth/register', 'ClientsController@register')->middleware('BasicAuth');
+ Router::post('/oauth/unregister', 'ClientsController@unregister')->middleware('BasicAuth');

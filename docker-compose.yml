@@ -25,7 +25,10 @@ services:
         volumes:
             - ./:/usr/share/nginx/html
     database:
-        image: mongo:3.7.1-jessie
+        build:
+            context: ./docker/mongo
+            dockerfile: Dockerfile
+        image: dockable/mongo
         networks:
             - dockablenet
         volumes:

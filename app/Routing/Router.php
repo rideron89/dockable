@@ -3,12 +3,12 @@
 namespace App\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
-use App\Response;
 use App\Middleware\Middleware;
 
 class Router
@@ -111,6 +111,8 @@ class Router
     * Attempt to route the currect request.
     *
     * @param Symfony\Component\HttpFoundation\Request $request
+    *
+    * @return Symfony\Component\HttpFoundation\Response
     */
     public static function route(Request $request)
     {
@@ -123,7 +125,7 @@ class Router
         }
         catch (ResourceNotFoundException $ex)
         {
-            Response::send('route not found', 404);
+            return new Response('route not found', 404);
         }
 
         // get route parameters
@@ -145,7 +147,7 @@ class Router
 
             if (count($split) < 2)
             {
-                Response::send('invalid controller setup for route "' . $request->getPathInfo() . '"', 501);
+                return new Response('invalid controller setup for route "' . $request->getPathInfo() . '"', 501);
             }
 
             $controller = $split[0];
@@ -159,16 +161,16 @@ class Router
                 {
                     $middlewareClassname = 'App\\Middleware\\' . $middleware;
 
-                    $middlewareClassname::run($request);
+                    $request = $middlewareClassname::run($request);
                 }
             }
 
             $instance = new $className();
-            $instance->$method($request);
+            return $instance->$method($request);
         }
         else
         {
-            Response::send('no controller setup', 501);
+            return new Response('no controller setup', 501);
         }
     }
 }

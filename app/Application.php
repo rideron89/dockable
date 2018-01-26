@@ -3,6 +3,7 @@
 namespace App;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use App\Routing\Router;
 
@@ -18,10 +19,12 @@ class Application
     }
 
     /**
-    * Start running the application by passing along the request.
+    * Start running the application by passing along the request and
+    * getting a response in return.
     */
     public function start()
     {
-        Router::route($this->request);
+        $response = Router::route($this->request);
+        $response->send();
     }
 }

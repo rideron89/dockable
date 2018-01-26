@@ -11,5 +11,5 @@ interface Middleware
     *
     * @param Symfony\Component\HttpFoundation\Request $request
     */
-    public static function run(Request $request);
+    public static function run(Request $request) : Request;
 }

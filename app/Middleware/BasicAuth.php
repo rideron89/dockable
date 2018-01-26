@@ -3,24 +3,34 @@
 namespace App\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-use App\Response;
-use App\Databases\MongoClient;
-use App\Databases\Result as DatabaseResult;
 use App\Services\AuthenticateUserService;
 
 class BasicAuth implements Middleware
 {
-    public static function run(Request $request)
+    /**
+    * Try to authenticate the user.
+    *
+    * @param Symfony\Component\HttpFoundation\Request $request
+    *
+    * @return Symfony\Component\HttpFoundation\Request
+    */
+    public static function run(Request $request) : Request
     {
         $user = trim($request->getUser());
         $pass = trim($request->getPassword());
 
-        $authorized = AuthenticateUserService::authenticate($user, $pass);
+        $result = AuthenticateUserService::authenticate($user, $pass);
 
-        if (!$authorized)
+        if (!$result['id'])
         {
-            Response::send('unauthorized', 401);
+            $response = new Response('unauthorized', 401);
+            $response->send();
         }
+
+        $request->attributes->set('user_id', $result['id']);
+
+        return $request;
     }
 }

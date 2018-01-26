@@ -8,28 +8,30 @@ class AuthenticateUserService
 {
     /**
     * Try to authenticate the user by querying the database and checking the
-    * username/password combo.
+    * username/password combo. If successful, returns the User's ID.
     *
     * @param string $username
     * @param string $password
     *
-    * @return bool
+    * @return array
     */
     public static function authenticate($username, $password)
     {
         if (!$username || !$password)
         {
-            return false;
+            return [];
         }
 
         $client = new MongoClient('dockable', 'users');
         $results = $client->find(['username' => $username]);
 
-        if (password_verify($password, $results->documents[0]['password']) === false)
+        if (password_verify($password, $results->data[0]['password']) === false)
         {
-            return false;
+            return [];
         }
 
-        return true;
+        return [
+            'id' => $results->data[0]['_id'],
+        ];
     }
 }
