@@ -3,8 +3,9 @@
 namespace App\Controllers;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-use App\Response;
+use App\ViewResponse;
 use App\Databases\MongoClient;
 use App\Services\AuthenticateUserService;
 
@@ -16,8 +17,9 @@ class HomeController
 
         if (!$login)
         {
-            header('Location: /login');
-            return;
+            $response = new Response();
+            $response->headers->set('Location', '/login');
+            $response->send();
         }
 
         $parts = explode(':', $login);
@@ -26,23 +28,31 @@ class HomeController
 
         if (!$username || !$password)
         {
-            header('Location: /login');
-            return;
+            $response = new Response();
+            $response->headers->set('Location', '/login');
+            $response->send();
         }
 
         $authorized = AuthenticateUserService::authenticate($username, $password);
 
         if (!$authorized)
         {
-            header('Location: /login');
-            return;
+            $response = new Response();
+            $response->headers->set('Location', '/login');
+            $response->send();
         }
 
-        Response::view('index.html');
+        $response = new ViewResponse();
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/html');
+        $response->send('index.html');
     }
 
     public function login(Request $request)
     {
-        Response::view('login.html');
+        $response = new ViewResponse();
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/html');
+        $response->send('login.html');
     }
 }
