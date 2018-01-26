@@ -16,11 +16,11 @@ class Result
     *
     * @var array
     */
-    public $documents;
+    public $data;
 
     public function __construct($results, $error = false)
     {
-        $this->documents = $results;
+        $this->data = $results;
 
         $this->err = $error;
     }
