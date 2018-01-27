@@ -5,7 +5,7 @@ namespace App\Controllers;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use App\ViewResponse;
+use App\Viewer;
 use App\Databases\MongoClient;
 use App\Services\AuthenticateUserService;
 
@@ -19,7 +19,7 @@ class HomeController
         {
             $response = new Response();
             $response->headers->set('Location', '/login');
-            $response->send();
+            return $response;
         }
 
         $parts = explode(':', $login);
@@ -30,7 +30,7 @@ class HomeController
         {
             $response = new Response();
             $response->headers->set('Location', '/login');
-            $response->send();
+            return $response;
         }
 
         $authorized = AuthenticateUserService::authenticate($username, $password);
@@ -39,20 +39,22 @@ class HomeController
         {
             $response = new Response();
             $response->headers->set('Location', '/login');
-            $response->send();
+            return $response;
         }
 
-        $response = new ViewResponse();
-        $response->setStatusCode(200);
-        $response->headers->set('Content-Type', 'text/html');
-        $response->send('index.html');
+        $response = new Response(Viewer::renderTwig('index.twig'));
+        return $response;
     }
 
     public function login(Request $request)
     {
-        $response = new ViewResponse();
-        $response->setStatusCode(200);
-        $response->headers->set('Content-Type', 'text/html');
-        $response->send('login.html');
+        $response = new Response(Viewer::renderTwig('login.twig'));
+        return $response;
+    }
+
+    public function register(Request $request)
+    {
+        $response = new Response(Viewer::renderTwig('register.twig'));
+        return $response;
     }
 }
