@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use MongoDB\BSON\ObjectId;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,7 +40,6 @@ class ClientsController
         // only extract the params we want
         $params = [
             'name'         => $request->request->get('name'),
-            'redirect_uri' => $request->request->get('redirect_uri'),
             'user_id'      => $request->attributes->get('user_id'),
         ];
 
@@ -58,7 +58,6 @@ class ClientsController
             return new Response("client already exists with name \"{$params['name']}\"", 409);
         }
 
-        // create the secret and refresh token
         $params['secret'] = bin2hex(openssl_random_pseudo_bytes(32));
 
         $result = $db->create($params);
@@ -73,7 +72,55 @@ class ClientsController
 
     public function update(Request $request)
     {
-        return new Response('update()', 200);
+        $db = new MongoClient('dockable', 'clients');
+        $id = $request->request->get('id');
+
+        $allowedFields = ['name'];
+        $params = [];
+
+        foreach ($allowedFields as $field)
+        {
+            $value = $request->request->get($field);
+
+            if ($value)
+            {
+                $params[$field] = $value;
+            }
+        }
+
+        $result = $db->update(['_id' => new ObjectId($id)], $params);
+
+        if ($result->err)
+        {
+            return new Response($result->err, 500);
+        }
+
+        return new Response(json_encode($result), 200);
+    }
+
+    /**
+    * Reset the client by creating a new secret it for it. This will
+    * invalidate the old one immediately.
+    *
+    * @param Symfony\Component\HttpFoundation\Request
+    *
+    * @return Symfony\Component\HttpFoundation\Response
+    */
+    public function reset(Request $request)
+    {
+        $db = new MongoClient('dockable', 'clients');
+        $id = $request->request->get('id');
+
+        $secret = bin2hex(openssl_random_pseudo_bytes(32));
+
+        $result = $db->update(['_id' => new ObjectId($id)], ['secret' => $secret]);
+
+        if ($result->err)
+        {
+            return new Response($result->err, 500);
+        }
+
+        return new Response(json_encode($result->data));
     }
 
     /**
@@ -87,19 +134,16 @@ class ClientsController
     {
         $db = new MongoClient('dockable', 'clients');
 
-        $params = [
-            'name'   => $request->request->get('name'),
-            'secret' => $request->request->get('secret'),
-        ];
+        $id = $request->request->get('id');
 
-        // make sure we have received all required fields
-        foreach ($params as $key => $value)
+        $result = $db->delete(['_id' => new ObjectId($id)]);
+
+        if ($result->err)
         {
-            if (!$value)
-            {
-                return new Response("\"$key\" field is required", 400);
-            }
+            return new Response($result->err, 500);
         }
+
+        return new Response(json_encode($id));
 
         // try to get the client object
         $result = $db->find(['name' => $params['name']]);

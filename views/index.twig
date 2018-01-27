@@ -17,7 +17,7 @@
         }
 
         html {
-            font-family: Spectral, Georgia, serif;
+            font-family: Nunito, Helvetica, sans-serif;
             -webkit-text-size-adjust: 100%;
         }
 
@@ -25,14 +25,35 @@
             margin: 0;
         }
 
+        input {
+            box-shadow: inset 1px 1px 2px #f5f5f5;
+            border: 1px solid #bababa;
+            font: inherit;
+            padding: 0 6px;
+            line-height: 2.2em;
+            width: 100%;
+        }
+
+        input:active,
+        input:focus {
+            border-color: #4343fe;
+        }
+
         button {
             border: 1px solid #aaa;
-            border-radius: 2px;
+            border-radius: 0;
             font: inherit;
             padding: 8px 10px;
             line-height: 1;
         }
 
+        hr {
+            border: 0;
+            height: 4px;
+            border-radius: 2px;
+            background: #ddd;
+            margin: 1.3em 0;
+        }
     </style>
 </head>
 <body>
@@ -41,12 +62,18 @@
 
     <button id="logout" type="button">Logout</button>
 
-    <p>Khaled Ipsum is a major key to success. Don’t ever play yourself. Stay focused. Stay focused. The other day the grass was brown, now it’s green because I ain’t give up. Never surrender. Always remember in the jungle there’s a lot of they in there, after you overcome they, you will make it to paradise. Watch your back, but more importantly when you get out the shower, dry your back, it’s a cold world out there. Let’s see what Chef Dee got that they don’t want us to eat.</p>
+    <a href="/clients">Your Clients</a>
 
-    <p>Congratulations, you played yourself. In life there will be road blocks but we will over come it. Congratulations, you played yourself. Major key, don’t fall for the trap, stay focused. It’s the ones closest to you that want to see you fail. I’m giving you cloth talk, cloth. Special cloth alert, cut from a special cloth. Bless up. Surround yourself with angels. To be successful you’ve got to work hard, to make history, simple, you’ve got to make it.</p>
+    <hr />
+
+    <section>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </section>
 
     <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
     <script>
+
+        // logout button
         document.querySelector('#logout').addEventListener('click', function(ev) {
             ev.preventDefault();
 

@@ -10,6 +10,7 @@ use App\Routing\Router;
 Router::get('/',      'HomeController@index');
 Router::get('/login', 'HomeController@login');
 Router::get('/register', 'HomeController@register');
+Router::get('/clients', 'HomeController@clients');
 
 /*------------------------------------------------------------*
  |
@@ -38,3 +39,5 @@ Router::post('/api/register', 'AuthController@register');
  *------------------------------------------------------------*/
  Router::post('/oauth/register', 'ClientsController@register')->middleware('BasicAuth');
  Router::post('/oauth/unregister', 'ClientsController@unregister')->middleware('BasicAuth');
+ Router::put('oauth/update-client', 'ClientsController@update')->middleware('BasicAuth');
+ Router::post('/oauth/reset-client', 'ClientsController@reset')->middleware('BasicAuth');
