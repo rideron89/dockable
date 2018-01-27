@@ -9,6 +9,7 @@ use App\Routing\Router;
  *------------------------------------------------------------*/
 Router::get('/',      'HomeController@index');
 Router::get('/login', 'HomeController@login');
+Router::get('/register', 'HomeController@register');
 
 /*------------------------------------------------------------*
  |
@@ -28,6 +29,7 @@ Router::delete('/api/sources/{source_id}', 'SourcesController@delete')->middlewa
  *------------------------------------------------------------*/
 Router::post('/api/login',  'AuthController@login');
 Router::get( '/api/logout', 'AuthController@logout');
+Router::post('/api/register', 'AuthController@register');
 
 /*------------------------------------------------------------*
  |

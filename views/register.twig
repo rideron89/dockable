@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Dockable</title>
+
+    <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            box-sizing: border-box;
+            font-kerning: auto;
+            text-rendering: optimizeLegibility;
+        }
+
+        html {
+            font-family: Spectral, Georgia, serif;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body: {
+            margin: 0;
+        }
+
+        input:not([type="submit"]) {
+            border: 1px solid #bababa;
+            border-radius: 2px;
+            font: inherit;
+            padding: 12px 10px;
+            line-height: 1;
+            width: 100%;
+        }
+
+        button {
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            font: inherit;
+            padding: 8px 10px;
+            line-height: 1;
+        }
+
+        form {
+            display: block;
+        }
+
+        form fieldset {
+            border: 0;
+            display: block;
+            margin: 0;
+            padding: 0 0 5px;
+        }
+
+        form fieldset + fieldset {
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dockable - Register</h1>
+
+    <form id="register-form">
+        <fieldset>
+            <label for="username">Username</label>
+            <input id="username" type="text" />
+        </fieldset>
+
+        <fieldset>
+            <label for="password">Password</label>
+            <input id="password" type="password" />
+        </fieldset>
+
+        <div id="response">
+        </div>
+
+        <fieldset>
+            <button type="submit">Register</button>
+
+            <a href="/login">Login</a>
+        </fieldset>
+    </form>
+
+    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+    <script>
+        document.querySelector('#register-form').addEventListener('submit', function(ev) {
+            ev.preventDefault();
+
+            let fields = Array.prototype.slice.call(ev.target.querySelectorAll('input'));
+            let params = new URLSearchParams();
+
+            fields.map(function(field) {
+                params.append(field.id, field.value);
+            });
+
+            axios.post('/api/register', params)
+            .then(function(response) {
+                console.log(response);
+            })
+            .catch(function(error) {
+                ev.target.querySelector('#response').innerHTML = error.response.data;
+            });
+        });
+    </script>
+</body>
+</html>
