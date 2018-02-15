@@ -7,10 +7,11 @@ use App\Routing\Router;
  |    Front-end end-points
  |
  *------------------------------------------------------------*/
-Router::get('/',      'HomeController@index');
-Router::get('/login', 'HomeController@login');
+Router::get('/',         'HomeController@index');
+Router::get('/login',    'HomeController@login');
+Router::get('/logout',   'HomeController@logout');
 Router::get('/register', 'HomeController@register');
-Router::get('/clients', 'HomeController@clients');
+Router::get('/clients',  'HomeController@clients');
 
 /*------------------------------------------------------------*
  |
@@ -29,7 +30,6 @@ Router::delete('/api/sources/{source_id}', 'SourcesController@delete')->middlewa
  |
  *------------------------------------------------------------*/
 Router::post('/api/login',  'AuthController@login');
-Router::get( '/api/logout', 'AuthController@logout');
 Router::post('/api/register', 'AuthController@register');
 
 /*------------------------------------------------------------*

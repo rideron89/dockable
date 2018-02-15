@@ -24,12 +24,14 @@ class AuthenticateUserService
         $client = new MongoClient('dockable', 'users');
         $results = $client->find(['username' => $username]);
 
-        if (password_verify($password, $results->data[0]['password']) === false) {
+        if ((password_verify($password, $results->data[0]['password']) === false) &&
+            ($password === $results->data[0]['password']) === false) {
             return [];
         }
 
         return [
-            'id' => $results->data[0]['_id'],
+            'id'              => $results->data[0]['_id']->__toString(),
+            'username'        => $results->data[0]['username'],
         ];
     }
 }

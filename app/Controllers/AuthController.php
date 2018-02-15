@@ -17,14 +17,20 @@ class AuthController
         $password = trim($request->request->get('password'));
 
         $authorized = AuthenticateUserService::authenticate($username, $password);
+        $password   = $authorized['hashed_password'];
 
         if (!$authorized) {
             Response::send('unauthorized', 401);
         }
 
-        CookieManagerService::add('login', "$username:$password");
+        // base64 encode the auth so it is not stored in plaintext as a cookie
+        $auth = base64_encode("$username:$password");
 
-        Response::send("Hello, $username!");
+        CookieManagerService::add('auth', $auth);
+
+        $response = new Response();
+        $response->headers->set('Location', '/');
+        return $response;
     }
 
     public function register(Request $request)
@@ -51,12 +57,5 @@ class AuthController
         $response = new Response();
         $response->headers->set('Location', '/login');
         return $response;
-    }
-
-    public function logout(Request $request)
-    {
-        CookieManagerService::remove('login');
-
-        Response::send('logged out');
     }
 }

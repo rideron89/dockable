@@ -60,27 +60,16 @@
 
     <h1>Dockable</h1>
 
-    <button id="logout" type="button">Logout</button>
-
-    <a href="/clients">Your Clients</a>
+    {% if user %}
+    <a href="/logout">Logout</a>
+    {% else %}
+    <a href="/login">Login</a>
+    {% endif %}
 
     <hr />
 
     <section>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
     </section>
-
-    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
-    <script>
-
-        // logout button
-        document.querySelector('#logout').addEventListener('click', function(ev) {
-            ev.preventDefault();
-
-            axios('/api/logout').then(function(response) {
-                window.location.href = window.location.href;
-            });
-        });
-    </script>
 </body>
 </html>
