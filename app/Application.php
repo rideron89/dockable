@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Application
 {
-    public function __construct()
+    public static function start()
     {
         $request = Request::createFromGlobals();
 

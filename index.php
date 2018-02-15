@@ -11,4 +11,4 @@ require __DIR__ . '/routes.php';
  |    Load the application and start it up!
  |
  *------------------------------------------------------------*/
-$app = new App\Application();
+App\Application::start();
