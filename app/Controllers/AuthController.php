@@ -18,8 +18,7 @@ class AuthController
 
         $authorized = AuthenticateUserService::authenticate($username, $password);
 
-        if (!$authorized)
-        {
+        if (!$authorized) {
             Response::send('unauthorized', 401);
         }
 
@@ -33,22 +32,19 @@ class AuthController
         $username = trim($request->request->get('username'));
         $password = trim($request->request->get('password'));
 
-        if (!$username || !$password)
-        {
+        if (!$username || !$password) {
             return new Response('invalid user data', 400);
         }
 
         $db = new MongoClient('dockable', 'users');
 
-        if ($db->exists(['username' => $username]))
-        {
+        if ($db->exists(['username' => $username])) {
             return new Response('account already exists', 409);
         }
 
         $result = $db->create(['username' => $username, 'password' => password_hash($password, PASSWORD_DEFAULT)]);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             return new Response($result->err, 500);
         }
 

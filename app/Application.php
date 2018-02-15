@@ -2,29 +2,17 @@
 
 namespace App;
 
+use App\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use App\Routing\Router;
-
 class Application
 {
-    public $request;
-
     public function __construct()
     {
-        include_once __DIR__ . '/../routes/web.php';
+        $request = Request::createFromGlobals();
 
-        $this->request = Request::createFromGlobals();
-    }
-
-    /**
-    * Start running the application by passing along the request and
-    * getting a response in return.
-    */
-    public function start()
-    {
-        $response = Router::route($this->request);
+        $response = Router::route($request);
         $response->send();
     }
 }

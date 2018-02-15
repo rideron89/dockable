@@ -8,22 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 use App\Databases\MongoClient;
 
-/*
-Client:
-    id: ObjectId
-    name: String
-    redirect_uri: String
-    owner_id: String
-    secret: String
-*/
-
-/*
-User:
-    id: ObjectId
-    username: String
-    password: String (hashed)
-*/
-
 class ClientsController
 {
     /**
@@ -44,17 +28,14 @@ class ClientsController
         ];
 
         // make sure we have received all required fields
-        foreach ($params as $key => $value)
-        {
-            if (!$value)
-            {
+        foreach ($params as $key => $value) {
+            if (!$value) {
                 return new Response("\"$key\" field is required", 400);
             }
         }
 
         // check for a client with the same name
-        if ($db->exists(['name' => $params['name']]))
-        {
+        if ($db->exists(['name' => $params['name']])) {
             return new Response("client already exists with name \"{$params['name']}\"", 409);
         }
 
@@ -62,8 +43,7 @@ class ClientsController
 
         $result = $db->create($params);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             return new Response($result->err, 500);
         }
 
@@ -78,20 +58,17 @@ class ClientsController
         $allowedFields = ['name'];
         $params = [];
 
-        foreach ($allowedFields as $field)
-        {
+        foreach ($allowedFields as $field) {
             $value = $request->request->get($field);
 
-            if ($value)
-            {
+            if ($value) {
                 $params[$field] = $value;
             }
         }
 
         $result = $db->update(['_id' => new ObjectId($id)], $params);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             return new Response($result->err, 500);
         }
 
@@ -115,8 +92,7 @@ class ClientsController
 
         $result = $db->update(['_id' => new ObjectId($id)], ['secret' => $secret]);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             return new Response($result->err, 500);
         }
 
@@ -138,8 +114,7 @@ class ClientsController
 
         $result = $db->delete(['_id' => new ObjectId($id)]);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             return new Response($result->err, 500);
         }
 
@@ -148,13 +123,11 @@ class ClientsController
         // try to get the client object
         $result = $db->find(['name' => $params['name']]);
 
-        if (count($result->data) < 1)
-        {
+        if (count($result->data) < 1) {
             return new Response("client \"{$params['name']}\" not found", 404);
         }
 
-        if ($result->data[0]['secret'] !== $params['secret'])
-        {
+        if ($result->data[0]['secret'] !== $params['secret']) {
             return new Response('unauthorized', 401);
         }
 

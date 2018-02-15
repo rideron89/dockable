@@ -2,9 +2,9 @@
 
 namespace App\Routing;
 
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
-class EnhancedRoute extends Route
+class Route extends SymfonyRoute
 {
     /**
     * Set the middleware for the route.
@@ -13,12 +13,9 @@ class EnhancedRoute extends Route
     */
     public function middleware($middleware)
     {
-        if ('string' === gettype($middleware))
-        {
+        if ('string' === gettype($middleware)) {
             $this->setDefault('middleware', [$middleware]);
-        }
-        else
-        {
+        } else {
             $this->setDefault('middleware', $middleware);
         }
     }

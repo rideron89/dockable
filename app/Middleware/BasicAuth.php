@@ -23,8 +23,7 @@ class BasicAuth implements Middleware
 
         $result = AuthenticateUserService::authenticate($user, $pass);
 
-        if (!$result['id'])
-        {
+        if (!$result['id']) {
             $response = new Response('unauthorized', 401);
             $response->send();
         }

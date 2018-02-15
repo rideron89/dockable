@@ -22,8 +22,7 @@ class SourcesController
 
         $result = $client->find();
 
-        if ($result->err)
-        {
+        if ($result->err) {
             Response::send($result->err, 500);
         }
 
@@ -43,13 +42,11 @@ class SourcesController
 
         $result = $client->find(['_id' => $id]);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             Response::send($result->err, 500);
         }
 
-        if (count($result->documents) < 1)
-        {
+        if (count($result->documents) < 1) {
             Response::send('source not found', 404);
         }
 
@@ -69,8 +66,7 @@ class SourcesController
 
         $result = $client->create($document);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             Response::send($result->err, 500);
         }
 
@@ -86,13 +82,12 @@ class SourcesController
     {
         $id = new ObjectId($request->params['source_id']);
         $document = $request->request->all();
-        
+
         $client = new MongoClient('dockable', 'sources');
 
         $result = $client->update(['_id' => $id], $document);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             Response::send($result->err, 500);
         }
 
@@ -112,8 +107,7 @@ class SourcesController
 
         $result = $client->delete(['_id' => $id]);
 
-        if ($result->err)
-        {
+        if ($result->err) {
             Response::send($result->err, 500);
         }
 

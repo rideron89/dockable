@@ -17,16 +17,14 @@ class AuthenticateUserService
     */
     public static function authenticate($username, $password)
     {
-        if (!$username || !$password)
-        {
+        if (!$username || !$password) {
             return [];
         }
 
         $client = new MongoClient('dockable', 'users');
         $results = $client->find(['username' => $username]);
 
-        if (password_verify($password, $results->data[0]['password']) === false)
-        {
+        if (password_verify($password, $results->data[0]['password']) === false) {
             return [];
         }
 

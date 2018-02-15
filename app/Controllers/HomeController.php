@@ -16,8 +16,7 @@ class HomeController
         $login = $request->cookies->get('login');
 
         // redirect to /login page if no credentials are given
-        if (!$login)
-        {
+        if (!$login) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;
@@ -29,8 +28,7 @@ class HomeController
         $password = $parts[1];
 
         // redirect to /login page if the credentials are invalid
-        if (!$username || !$password)
-        {
+        if (!$username || !$password) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;
@@ -39,8 +37,7 @@ class HomeController
         $userId = AuthenticateUserService::authenticate($username, $password);
 
         // redirect to the /login page if the credentials are invalid
-        if (!$userId)
-        {
+        if (!$userId) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;
@@ -55,8 +52,7 @@ class HomeController
         $login = $request->cookies->get('login');
 
         // redirect to /login page if no credentials are given
-        if (!$login)
-        {
+        if (!$login) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;
@@ -68,8 +64,7 @@ class HomeController
         $password = $parts[1];
 
         // redirect to /login page if the credentials are invalid
-        if (!$username || !$password)
-        {
+        if (!$username || !$password) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;
@@ -78,8 +73,7 @@ class HomeController
         $userId = AuthenticateUserService::authenticate($username, $password);
 
         // redirect to the /login page if the credentials are invalid
-        if (!$userId)
-        {
+        if (!$userId) {
             $response = new Response();
             $response->headers->set('Location', '/login');
             return $response;

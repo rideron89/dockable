@@ -2,14 +2,14 @@
 
 namespace App\Routing;
 
+use App\Middleware\Middleware;
+use App\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-
-use App\Middleware\Middleware;
 
 class Router
 {
@@ -29,11 +29,11 @@ class Router
     * @param string $controller
     * @param string $method [default: 'GET']
     *
-    * @return App\Routing\EnhancedRoute
+    * @return App\Routing\Route
     */
     public static function addRoute($path, $controller, $method = 'GET')
     {
-        $route = new EnhancedRoute(
+        $route = new Route(
             $path,                              // path
             array(                              // default values
                 '_controller' => $controller,
@@ -45,8 +45,7 @@ class Router
             array($method)                      // methods
         );
 
-        if (!self::$routes[$method])
-        {
+        if (!self::$routes[$method]) {
             self::$routes[$method] = new RouteCollection();
         }
 
@@ -61,7 +60,7 @@ class Router
     * @param string $path
     * @param string $controller
     *
-    * @return App\Routing\EnhancedRoute
+    * @return App\Routing\Route
     */
     public static function get($path, $controller)
     {
@@ -74,7 +73,7 @@ class Router
     * @param string $path
     * @param string $controller
     *
-    * @return App\Routing\EnhancedRoute
+    * @return App\Routing\Route
     */
     public static function post($path, $controller)
     {
@@ -87,7 +86,7 @@ class Router
     * @param string $path
     * @param string $controller
     *
-    * @return App\Routing\EnhancedRoute
+    * @return App\Routing\Route
     */
     public static function put($path, $controller)
     {
@@ -100,7 +99,7 @@ class Router
     * @var string $path
     * @var string $controller
     *
-    * @return App\Routing\EnhancedRoute
+    * @return App\Routing\Route
     */
     public static function delete($path, $controller)
     {
@@ -119,12 +118,9 @@ class Router
         $context = new RequestContext('/', $request->getMethod());
         $matcher = new UrlMatcher(self::$routes[$request->getMethod()], $context);
 
-        try
-        {
+        try {
             $match = $matcher->match($request->getPathInfo());
-        }
-        catch (ResourceNotFoundException $ex)
-        {
+        } catch (ResourceNotFoundException $ex) {
             return new Response('route not found', 404);
         }
 
@@ -135,18 +131,15 @@ class Router
         // first item is the full match, so remove it
         array_shift($paramMatches);
 
-        foreach ($paramMatches as $param)
-        {
+        foreach ($paramMatches as $param) {
             $request->params[$param] = $match[$param];
         }
 
-        if ($match['_controller'])
-        {
+        if ($match['_controller']) {
             // expect _controller to look like 'ClassName@methodName'
             $split = explode('@', $match['_controller']);
 
-            if (count($split) < 2)
-            {
+            if (count($split) < 2) {
                 return new Response('invalid controller setup for route "' . $request->getPathInfo() . '"', 501);
             }
 
@@ -155,10 +148,8 @@ class Router
             $className  = 'App\\Controllers\\' . $controller;
 
             // run the middleware if any is set
-            if ($match['middleware'])
-            {
-                foreach ($match['middleware'] as $middleware)
-                {
+            if ($match['middleware']) {
+                foreach ($match['middleware'] as $middleware) {
                     $middlewareClassname = 'App\\Middleware\\' . $middleware;
 
                     $request = $middlewareClassname::run($request);
@@ -166,10 +157,9 @@ class Router
             }
 
             $instance = new $className();
+
             return $instance->$method($request);
-        }
-        else
-        {
+        } else {
             return new Response('no controller setup', 501);
         }
     }
