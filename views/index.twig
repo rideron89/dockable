@@ -16,17 +16,19 @@
         <h1>Dockable</h1>
 
         <div class="box naked">
-            {% if user %}
-            <a href="/logout" class="button" id="logout">Logout</a>
-            {% else %}
-            <a href="/login" class="button">Login</a>
-            {% endif %}
+            <section class="ov-h">
+                <p class="fl-l">Welcome to the dashboard.</p>
+
+                <div class="fl-r">
+                    {% if user %}
+                    <a href="/logout" class="button" id="logout"><i class="material-icons">exit_to_app</i> Logout</a>
+                    {% else %}
+                    <a href="/login" class="button"><i class="material-icons">person</i>Login</a>
+                    {% endif %}
+                </div>
+            </section>
 
             <hr />
-
-            <section>
-                <p>Welcome to the dashboard.</p>
-            </section>
 
             <section class="auth-tokens">
                 <h2>All Auth Tokens</h2>
@@ -51,7 +53,7 @@
                                 <td>{{ token['_id'] }}</td>
                                 <td title="{{ token['user'].id }}">{{ token['user'].username }}</td>
                                 <td title="{{ token['expires_date'] }}">{{ token['expires_date']|date('Y-m-d H:i:s') }}</td>
-                                <td class="ta-c"><a href="#" class="button icon danger delete-token" data-token-id="{{ token['_id'] }}"><i class="material-icons">block</i></a></td>
+                                <td class="ta-c"><a href="#" class="button icon danger delete-token" data-token-id="{{ token['_id'] }}"><i class="material-icons">block</i> De-authorize</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

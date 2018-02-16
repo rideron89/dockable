@@ -18,6 +18,8 @@ class HomeController
         $auth = base64_decode(trim($auth));
         $auth = json_decode($auth, true);
 
+        // TODO: need to find a safeguard for unauthorized cookies
+
         $user = ($auth) ? $auth['user'] : [];
 
         // get all tokens
