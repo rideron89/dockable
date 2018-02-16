@@ -1,0 +1,25 @@
+{
+    "name": "dockable",
+    "version": "1.0.0",
+    "description": "Dockable is a small PHP framework for working with HTTP requests and responses. The name comes from my desire to gain a better understanding of using [Docker](https://www.docker.com/).",
+    "main": "index.js",
+    "scripts": {
+        "sass:dev": "node-sass ./source/sass/main.sass --output ./dist --source-map-embed --source-map-contents",
+        "sass:watch": "npm run sass:dev -- --watch",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rideron89/dockable.git"
+    },
+    "keywords": [],
+    "author": "Ron Rider <rideron89@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/rideron89/dockable/issues"
+    },
+    "homepage": "https://github.com/rideron89/dockable#readme",
+    "dependencies": {
+        "node-sass": "^4.7.2"
+    }
+}
