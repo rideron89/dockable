@@ -7,81 +7,37 @@
 
     <title>Dockable</title>
 
-    <style>
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            box-sizing: border-box;
-            font-kerning: auto;
-            text-rendering: optimizeLegibility;
-        }
-
-        html {
-            font-family: Spectral, Georgia, serif;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        body: {
-            margin: 0;
-        }
-
-        input:not([type="submit"]) {
-            border: 1px solid #bababa;
-            border-radius: 2px;
-            font: inherit;
-            padding: 12px 10px;
-            line-height: 1;
-            width: 100%;
-        }
-
-        button {
-            border: 1px solid #aaa;
-            border-radius: 2px;
-            font: inherit;
-            padding: 8px 10px;
-            line-height: 1;
-        }
-
-        form {
-            display: block;
-        }
-
-        form fieldset {
-            border: 0;
-            display: block;
-            margin: 0;
-            padding: 0 0 5px;
-        }
-
-        form fieldset + fieldset {
-            padding-top: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/dist/main.css" />
 </head>
 <body>
 
-    <h1>Dockable - Register</h1>
+    <main class="container">
+        <h1>Dockable - Register</h1>
 
-    <form id="register-form">
-        <fieldset>
-            <label for="username">Username</label>
-            <input id="username" type="text" />
-        </fieldset>
+        <div class="box">
+            <form id="register-form">
+                <fieldset>
+                    <label for="username">Username</label>
+                    <input id="username" type="text" />
+                </fieldset>
 
-        <fieldset>
-            <label for="password">Password</label>
-            <input id="password" type="password" />
-        </fieldset>
+                <fieldset>
+                    <label for="password">Password</label>
+                    <input id="password" type="password" />
+                </fieldset>
 
-        <div id="response">
+                <div>
+                    <div id="error-message"></div>
+                </div>
+
+                <fieldset>
+                    <button type="submit">Register</button>
+
+                    <a class="ml-2" href="/login">Login</a>
+                </fieldset>
+            </form>
         </div>
-
-        <fieldset>
-            <button type="submit">Register</button>
-
-            <a href="/login">Login</a>
-        </fieldset>
-    </form>
+    </main>
 
     <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
     <script>
@@ -100,7 +56,7 @@
                 console.log(response);
             })
             .catch(function(error) {
-                ev.target.querySelector('#response').innerHTML = error.response.data;
+                ev.target.querySelector('#error-message').innerHTML = error.response.data;
             });
         });
     </script>

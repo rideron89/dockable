@@ -3,18 +3,27 @@ $font-serif:      Spectral, Times, Georgia, sans-serif
 
 @import 'global'
 
-.button
-    background: #fff
-    border: 1px solid #e2e2e2
-    box-shadow: 0px 0px 4px #d8d8d8
-    color: #424242
-    display: inline-block
-    font-weight: 700
-    padding: 12px
-    line-height: 1
-    text-decoration: none
-    transition: all 0.10s ease
-    width: auto
+.container
+    margin: 0 auto
+    max-width: 1000px
 
-    &:hover
-        background: #f7f7f7
+.box
+    border: 1px solid #c5c5c5
+    border-radius: 4px
+    box-shadow: 0px 0px 6px 2px #e0e0e0
+    padding: 20px
+
+    &.naked
+        border: 0
+        box-shadow: none
+        padding: 0
+
+.ml-1
+    margin-left: 5px
+
+.ml-2
+    margin-left: 10px
+
+#error-message
+    color: #d21c1c
+    margin: 10px 0
