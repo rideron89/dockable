@@ -25,4 +25,4 @@ Router::post('/api/register', 'AuthController@register');
  |    Token API end-points
  |
  *------------------------------------------------------------*/
-Router::delete('/api/token/{token_id}', 'TokenController@delete');
+Router::delete('/api/token/{token_id}', 'TokenController@delete')->middleware('TokenAuth');
