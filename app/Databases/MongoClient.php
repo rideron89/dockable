@@ -128,6 +128,7 @@ class MongoClient extends Client
         } catch (MongoException $e) {
             return new DatabaseResult(null, $e->getMessage());
         }
+    }
 
     /**
     * Create a document from POST data.
