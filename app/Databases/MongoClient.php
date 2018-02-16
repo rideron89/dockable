@@ -85,6 +85,7 @@ class MongoClient extends Client
     public function find($filter = [], $options = [])
     {
         $documents = [];
+        $result = new DatabaseResult();
 
         try {
             $connection = $this->_connect();
@@ -96,10 +97,12 @@ class MongoClient extends Client
                 array_push($documents, (array)$doc);
             }
 
-            return new DatabaseResult($documents);
+            $result->data = $documents;
         } catch (MongoException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         }
+
+        return $result;
     }
 
     /**
@@ -113,6 +116,7 @@ class MongoClient extends Client
     public function findOne($filter = [], $options = [])
     {
         $documents = [];
+        $result = new DatabaseResult();
 
         try {
             $connection = $this->_connect();
@@ -124,10 +128,12 @@ class MongoClient extends Client
                 array_push($documents, (array)$doc);
             }
 
-            return new DatabaseResult($documents[0]);
+            $result->data = $documents[0];
         } catch (MongoException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         }
+
+        return $result;
     }
 
     /**
@@ -139,6 +145,8 @@ class MongoClient extends Client
     */
     public function create($document)
     {
+        $result = new DatabaseResult();
+
         try {
             $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
@@ -151,12 +159,14 @@ class MongoClient extends Client
             $newDocument = $document;
             $newDocument['id'] = $newId->jsonSerialize()['$oid'];
 
-            return new DatabaseResult($newDocument);
+            $result->data = $newDocument;
         } catch (MongoException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         } catch (BulkWriteException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         }
+
+        return $result;
     }
 
     /**
@@ -169,6 +179,8 @@ class MongoClient extends Client
     */
     public function update($filter, $document)
     {
+        $result = new DatabaseResult();
+
         try {
             $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
@@ -178,12 +190,14 @@ class MongoClient extends Client
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
 
-            return new DatabaseResult($document);
+            $result->data = $document;
         } catch (MongoException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         } catch (BulkWriteException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         }
+
+        return $result;
     }
 
     /**
@@ -195,6 +209,8 @@ class MongoClient extends Client
     */
     public function delete($filter)
     {
+        $result = new DatabaseResult();
+
         try {
             $connection = $this->_connect();
             $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
@@ -204,11 +220,13 @@ class MongoClient extends Client
 
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
 
-            return new DatabaseResult($filter);
+            $result->data = $filter;
         } catch (MongoException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         } catch (BulkWriteException $e) {
-            return new DatabaseResult(null, $e->getMessage());
+            $result->err = $e->getMessage();
         }
+
+        return $result;
     }
 }

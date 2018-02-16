@@ -18,7 +18,7 @@ class Result
     */
     public $data;
 
-    public function __construct($results, $error = false)
+    public function __construct($results = [], $error = false)
     {
         $this->data = $results;
 
