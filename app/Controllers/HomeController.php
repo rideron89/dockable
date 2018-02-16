@@ -24,7 +24,11 @@ class HomeController
         $client = new MongoClient('dockable', 'auth_tokens');
         $tokens = $client->find()->data;
 
-        $html = Viewer::renderTwig('index.twig', ['user' => $user, 'tokens' => $tokens]);
+        // get all users
+        $client = new MongoClient('dockable', 'users');
+        $users  = $client->find([], ['projection' => ['password' => 0]])->data;
+
+        $html = Viewer::renderTwig('index.twig', ['user' => $user, 'tokens' => $tokens, 'users' => $users]);
 
         return new Response($html);
     }

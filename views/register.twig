@@ -53,7 +53,7 @@
 
             axios.post('/api/register', params)
             .then(function(response) {
-                console.log(response);
+                window.location.href = '/';
             })
             .catch(function(error) {
                 ev.target.querySelector('#error-message').innerHTML = error.response.data;

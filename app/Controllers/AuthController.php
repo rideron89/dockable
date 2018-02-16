@@ -6,7 +6,7 @@ namespace App\Controllers;
 use App\Databases\MongoClient;
 use App\Services\AuthenticateUserService;
 use App\Services\CookieManagerService;
-use MongoDB\BSON\ObjectId; 
+use MongoDB\BSON\ObjectId;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,7 +30,7 @@ class AuthController
         // set up the token object
         $document = [
             'user'    => [
-                '_id'      => $user->data[0]['_id'],
+                'id'      => $user->data[0]['_id']->__toString(),
                 'username' => $user->data[0]['username'],
             ],
             'token'   => bin2hex(random_bytes(16)),
@@ -86,8 +86,6 @@ class AuthController
             return new Response($result->err, 500);
         }
 
-        $response = new Response();
-        $response->headers->set('Location', '/login');
-        return $response;
+        return new Response('Ok');
     }
 }

@@ -25,37 +25,68 @@
             <hr />
 
             <section>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p>Welcome to the dashboard.</p>
             </section>
 
-            {% if user %}
-            <section>
+            <section class="auth-tokens">
                 <h2>All Auth Tokens</h2>
 
-                <p>This is a list of all auth tokens currently in use. There {{ (tokens|length == 1) ? 'is' : 'are' }} {{ tokens|length }} of them.</p>
+                {% if not user %}
+                    <p>You must be logged in to view auth tokens.</p>
+                {% else %}
+                    <p>This is a list of all auth tokens currently in use. There {{ (tokens|length == 1) ? 'is' : 'are' }} {{ tokens|length }} of them.</p>
 
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>_id</th>
-                            <th>user.username</th>
-                            <th>expires_date</th>
-                            <th>Unauthorize</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for token in tokens %}
-                        <tr>
-                            <td>{{ token['_id'] }}</td>
-                            <td title="{{ token['user']._id.__toString() }}">{{ token['user'].username }}</td>
-                            <td title="{{ token['expires_date'] }}">{{ token['expires_date']|date('Y-m-d H:i:s') }}</td>
-                            <td class="ta-c"><a href="#" class="button icon danger delete-token" data-token-id="{{ token['_id'] }}"><i class="material-icons">block</i></a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>_id</th>
+                                <th>user.username</th>
+                                <th>expires_date</th>
+                                <th>Unauthorize</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for token in tokens %}
+                            <tr>
+                                <td>{{ token['_id'] }}</td>
+                                <td title="{{ token['user'].id }}">{{ token['user'].username }}</td>
+                                <td title="{{ token['expires_date'] }}">{{ token['expires_date']|date('Y-m-d H:i:s') }}</td>
+                                <td class="ta-c"><a href="#" class="button icon danger delete-token" data-token-id="{{ token['_id'] }}"><i class="material-icons">block</i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </section>
-            {% endif %}
+
+            <section class="users">
+                <h2>All Users</h2>
+
+                {% if not user %}
+                    <p>You must be logged in to view users.</p>
+                {% else %}
+                    <p>This is a list of all users currently registered. There {{ (users|length == 1) ? 'is' : 'are' }} {{ users|length }} of them.</p>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>_id</th>
+                                <th>username</th>
+                                <th>email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user['_id'] }}</td>
+                                <td>{{ user['username'] }}</td>
+                                <td>{{ user['email'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </section>
         </div>
     </main>
 
