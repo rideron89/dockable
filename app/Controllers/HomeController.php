@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Viewer;
 use App\Databases\MongoClient;
-use App\Services\AuthenticateUserService;
 use App\Services\CookieManagerService;
 use MongoDB\BSON\ObjectId;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +33,7 @@ class HomeController
 
         return new Response($html);
     }
-    
+
     public function register(Request $request)
     {
         return new Response(Viewer::renderTwig('register.twig'));

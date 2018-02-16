@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 
 use App\Databases\MongoClient;
-use App\Services\AuthenticateUserService;
 use App\Services\CookieManagerService;
 use MongoDB\BSON\ObjectId;
 use Symfony\Component\HttpFoundation\Response;
