@@ -153,6 +153,11 @@ class Router
                     $middlewareClassname = 'App\\Middleware\\' . $middleware;
 
                     $request = $middlewareClassname::run($request);
+
+                    // middleware returned a Response, so end here
+                    if ($request instanceof Response) {
+                        return $request;
+                    }
                 }
             }
 

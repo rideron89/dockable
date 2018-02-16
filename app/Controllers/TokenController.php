@@ -18,10 +18,6 @@ class TokenController
 
         $token_id = $request->params['token_id'];
 
-        if ($auth['id'] === $token_id) {
-            CookieManagerService::remove('auth');
-        }
-
         if (!$token_id) {
             return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
         }
@@ -31,6 +27,11 @@ class TokenController
 
         if ($client->err) {
             return new Response($client->err, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // remove the cookie if the token it refers to was removed
+        if ($auth['id'] === $token_id) {
+            CookieManagerService::remove('auth');
         }
 
         return new Response('Deleted', Response::HTTP_OK);

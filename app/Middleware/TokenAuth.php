@@ -18,9 +18,7 @@ class TokenAuth implements Middleware
         $auth = json_decode($auth, true);
 
         if (!$auth) {
-            $response = new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
-            $response->send();
-            die();
+            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
         $client = new MongoClient('dockable', 'auth_tokens');
@@ -28,16 +26,12 @@ class TokenAuth implements Middleware
 
         // check for token not found
         if (!$token || $token->err) {
-            $response = new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
-            $response->send();
-            die();
+            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
         // check expration date
         if (time() >= $token->data[0]['expires_date']) {
-            $response = new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
-            $response->send();
-            die();
+            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
         return $request;
