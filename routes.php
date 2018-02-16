@@ -26,3 +26,10 @@ Router::post('/api/register', 'AuthController@register');
  |
  *------------------------------------------------------------*/
 Router::delete('/api/token/{token_id}', 'TokenController@delete')->middleware('TokenAuth');
+
+/*------------------------------------------------------------*
+ |
+ |    User API end-points
+ |
+ *------------------------------------------------------------*/
+ Router::put('/api/user/{token_id}', 'UserController@update')->middleware('TokenAuth');

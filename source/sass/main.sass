@@ -33,6 +33,9 @@ $font-serif:      Spectral, Times, Georgia, sans-serif
 .ov-h
     overflow: hidden
 
+.pos-r
+    position: relative
+
 .ta-c
     text-align: center
 
@@ -40,6 +43,34 @@ $font-serif:      Spectral, Times, Georgia, sans-serif
     font-size: 1.2em
     margin-right: 2px
     vertical-align: -0.22em
+
+.modal
+    background: rgba(0, 0, 0, 0.5)
+    height: 100vh
+    width: 100vw
+    left: 0
+    opacity: 0.0
+    position: fixed
+    right: 0
+    top: 0
+    transform: scale(0)
+    transition: all 0.25s ease
+
+    &.shown
+        opacity: 1.0
+        transform: scale(1)
+
+    .inner
+        background: #fff
+        border: 1px solid #000
+        margin: 0 auto
+        position: relative
+        max-height: calc(100vh - 40px)
+        max-width: calc(100% - 40px)
+        padding: 20px 40px 60px
+        top: 50%
+        transform: translateY(-50%)
+        width: 800px
 
 #error-message
     color: #d21c1c
