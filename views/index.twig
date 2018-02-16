@@ -7,6 +7,7 @@
 
     <title>Dockable</title>
 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" href="/dist/main.css" />
 </head>
 <body>
@@ -26,6 +27,35 @@
             <section>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
             </section>
+
+            {% if user %}
+            <section>
+                <h2>All Auth Tokens</h2>
+
+                <p>This is a list of all auth tokens currently in use. There {{ (tokens|length == 1) ? 'is' : 'are' }} {{ tokens|length }} of them.</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>_id</th>
+                            <th>user.username</th>
+                            <th>expires_date</th>
+                            <th>Unauthorize</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for token in tokens %}
+                        <tr>
+                            <td>{{ token['_id'] }}</td>
+                            <td title="{{ token['user']._id.__toString() }}">{{ token['user'].username }}</td>
+                            <td title="{{ token['expires_date'] }}">{{ token['expires_date']|date('Y-m-d H:i:s') }}</td>
+                            <td class="ta-c"><a href="#" class="button icon danger delete-token" data-token-id="{{ token['_id'] }}"><i class="material-icons">block</i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            {% endif %}
         </div>
     </main>
 
@@ -37,6 +67,18 @@
 
                 axios.post('/api/logout')
                 .then(function(response) {
+                    window.location.href = window.location.href;
+                });
+            });
+        });
+
+        Array.prototype.slice.call(document.querySelectorAll('.delete-token')).forEach(function(elem) {
+            elem.addEventListener('click', function(ev) {
+                ev.preventDefault();
+
+                let tokenId = ev.currentTarget.dataset.tokenId;
+
+                axios.delete(`/api/token/${tokenId}`).then(function(response) {
                     window.location.href = window.location.href;
                 });
             });

@@ -9,7 +9,7 @@ html
     -webkit-text-size-adjust: 100%
     color: #292929
     font-family: $font-sans-serif
-    font-size: 18px
+    font-size: 16px
     line-height: 1.6
 
 body
@@ -48,6 +48,21 @@ button,
 
     &:hover
         background: #f7f7f7
+        color: #424242
+
+    &.icon
+        border-radius: 4px
+        padding: 3px 3px 0px
+        vertical-align: middle
+
+    &.danger
+        background: #fb7474
+        border-color: #e45252
+        box-shadow: 0px 0px 4px #f58989
+        color: #fff
+
+        &:hover
+            background: #f34e4e
 
 form
     display: block
@@ -87,3 +102,12 @@ label
     display: block
     margin-bottom: 10px
     text-indent: 2px
+
+table
+    border-collapse: collapse
+    table-layout: auto
+    width: 100%
+
+    td
+        border: 1px solid #bfbfbf
+        padding: 6px 12px

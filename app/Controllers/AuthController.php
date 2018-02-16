@@ -2,12 +2,13 @@
 
 namespace App\Controllers;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 use App\Databases\MongoClient;
 use App\Services\AuthenticateUserService;
 use App\Services\CookieManagerService;
+use MongoDB\BSON\ObjectId; 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class AuthController
 {
@@ -28,7 +29,10 @@ class AuthController
 
         // set up the token object
         $document = [
-            'user_id' => $user->data[0]['_id'],
+            'user'    => [
+                '_id'      => $user->data[0]['_id'],
+                'username' => $user->data[0]['username'],
+            ],
             'token'   => bin2hex(random_bytes(16)),
             'expires_date' => time() + 2419200 // 4 weeks
         ];
@@ -46,6 +50,16 @@ class AuthController
 
     public function logout(Request $request)
     {
+        $auth = CookieManagerService::get('auth');
+        $auth = base64_decode(trim($auth));
+        $auth = json_decode($auth, true);
+
+        if ($auth) {
+            // remove the token
+            $client = new MongoClient('dockable', 'auth_tokens');
+            $client->delete(['_id' => new ObjectId($auth['id'])]);
+        }
+
         CookieManagerService::remove('auth');
 
         return new Response('Ok');

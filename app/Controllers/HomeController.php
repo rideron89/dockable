@@ -18,19 +18,13 @@ class HomeController
         $auth = base64_decode(trim($auth));
         $auth = json_decode($auth, true);
 
-        if (!$auth) {
-            $user = [];
-        } else {
-            $client = new MongoClient('dockable', 'users');
+        $user = ($auth) ? $auth['user'] : [];
 
-            $user = $client->find([
-                '_id' => new ObjectId($auth['user_id']['$oid'])
-            ], [
-                'projection' => ['password' => 0]
-            ]);
-        }
+        // get all tokens
+        $client = new MongoClient('dockable', 'auth_tokens');
+        $tokens = $client->find()->data;
 
-        $html = Viewer::renderTwig('index.twig', ['user' => $user]);
+        $html = Viewer::renderTwig('index.twig', ['user' => $user, 'tokens' => $tokens]);
 
         return new Response($html);
     }
