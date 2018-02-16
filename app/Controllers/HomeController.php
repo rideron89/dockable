@@ -34,12 +34,7 @@ class HomeController
 
         return new Response($html);
     }
-
-    public function login(Request $request)
-    {
-        return new Response(Viewer::renderTwig('login.twig'));
-    }
-
+    
     public function register(Request $request)
     {
         return new Response(Viewer::renderTwig('register.twig'));

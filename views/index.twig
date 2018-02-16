@@ -23,7 +23,7 @@
                     {% if user %}
                     <a href="/logout" class="button" id="logout"><i class="material-icons">exit_to_app</i> Logout</a>
                     {% else %}
-                    <a href="/login" class="button"><i class="material-icons">person</i>Login</a>
+                    <a href="/login" class="button" id="login-button"><i class="material-icons">person</i>Login</a>
                     {% endif %}
                 </div>
             </section>
@@ -96,11 +96,37 @@
             </section>
         </div>
 
+        <div id="login-modal" class="modal">
+            <div class="inner">
+                <a href="#" class="close-modal"><i class="material-icons">close</i></a>
+
+                <h2>Login</h2>
+
+                <form id="login-form">
+                    <fieldset>
+                        <label for="login-username">Username</label>
+                        <input id="login-username" type="text" />
+                    </fieldset>
+
+                    <fieldset>
+                        <label for="login-password">Password</label>
+                        <input id="login-password" type="password" />
+                    </fieldset>
+
+                    <fieldset>
+                        <button type="submit">Login</button>
+
+                        <a class="ml-2" href="/register">Register account</a>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
         <div class="modal">
             <div class="inner">
-                <h2>Edit User</h2>
-
                 <a href="#" class="close-modal"><i class="material-icons">close</i></a>
+
+                <h2>Edit User</h2>
 
                 <form id="edit-user-form" action="" method="post">
                     <fieldset>
@@ -132,15 +158,45 @@
 
     <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
     <script>
-        // Logout button
-        Array.prototype.slice.call(document.querySelectorAll('#logout')).forEach(function(elem) {
-            elem.addEventListener('click', function(ev) {
+        // Login button
+        if (document.querySelector('#login-button')) {
+            document.querySelector('#login-button').addEventListener('click', function(ev) {
                 ev.preventDefault();
 
-                axios.post('/api/logout')
-                .then(function(response) {
+                let $modal = document.querySelector('#login-modal');
+
+                $modal.classList.add('shown');
+            });
+        }
+
+        // Logout button
+        if (document.querySelector('#logout')) {
+            document.querySelector('#logout').addEventListener('click', function(ev) {
+                ev.preventDefault();
+
+                axios.post('/api/logout').then(function(response) {
                     window.location.href = window.location.href;
                 });
+            });
+        }
+
+        // Login form
+        document.querySelector('#login-form').addEventListener('submit', function(ev) {
+            ev.preventDefault();
+
+            let fields = ev.target.querySelectorAll('input');
+            let params = new URLSearchParams();
+
+            Array.prototype.slice.call(fields).map((el, index) => {
+                params.append(el.id.split('-')[1], el.value);
+            });
+
+            axios.post('/api/login', params).then(function(response) {
+                window.location.href = '/';
+            }).catch(function(error) {
+                if (error.response.status === 401) {
+                    document.querySelector('#error-message').innerText = 'Incorrect username/password combo';
+                }
             });
         });
 
