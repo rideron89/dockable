@@ -17,8 +17,8 @@
         }
 
         html {
-            font-family: Nunito, Helvetica, sans-serif;
             -webkit-text-size-adjust: 100%;
+            font-family: Nunito, Helvetica, sans-serif;
         }
 
         body: {
@@ -61,7 +61,7 @@
     <h1>Dockable</h1>
 
     {% if user %}
-    <a href="/logout">Logout</a>
+    <a href="/logout" id="logout">Logout</a>
     {% else %}
     <a href="/login">Login</a>
     {% endif %}
@@ -71,5 +71,19 @@
     <section>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
     </section>
+
+    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+    <script>
+        Array.prototype.slice.call(document.querySelectorAll('#logout')).forEach(function(elem) {
+            elem.addEventListener('click', function(ev) {
+                ev.preventDefault();
+
+                axios.post('/api/logout')
+                .then(function(response) {
+                    window.location.href = window.location.href;
+                });
+            });
+        });
+    </script>
 </body>
 </html>

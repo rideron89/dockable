@@ -13,24 +13,42 @@ class AuthController
 {
     public function login(Request $request)
     {
+        // retrieve and sanitize credentials from the request
         $username = trim($request->request->get('username'));
         $password = trim($request->request->get('password'));
 
-        $authorized = AuthenticateUserService::authenticate($username, $password);
-        $password   = $authorized['hashed_password'];
+        // get the user
+        $client = new MongoClient('dockable', 'users');
+        $user = $client->find(['username' => $username]);
 
-        if (!$authorized) {
-            Response::send('unauthorized', 401);
+        // test the user credentials
+        if (!password_verify($password, $user->data[0]['password'])) {
+            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
-        // base64 encode the auth so it is not stored in plaintext as a cookie
-        $auth = base64_encode("$username:$password");
+        // set up the token object
+        $document = [
+            'user_id' => $user->data[0]['_id'],
+            'token'   => bin2hex(random_bytes(16)),
+            'expires_date' => time() + 2419200 // 4 weeks
+        ];
 
+        // add a new entry to the token database
+        $client = new MongoClient('dockable', 'auth_tokens');
+        $result = $client->create($document);
+
+        // save the token data in a cookie for future requests
+        $auth = base64_encode(json_encode($result->data));
         CookieManagerService::add('auth', $auth);
 
-        $response = new Response();
-        $response->headers->set('Location', '/');
-        return $response;
+        return new Response($auth);
+    }
+
+    public function logout(Request $request)
+    {
+        CookieManagerService::remove('auth');
+
+        return new Response('Ok');
     }
 
     public function register(Request $request)

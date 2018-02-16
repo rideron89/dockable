@@ -56,6 +56,11 @@
         form fieldset + fieldset {
             padding-top: 5px;
         }
+
+        #error-message {
+            color: #d21c1c;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -72,6 +77,10 @@
             <label for="password">Password</label>
             <input id="password" type="password" />
         </fieldset>
+
+        <div>
+            <div id="error-message"></div>
+        </div>
 
         <fieldset>
             <button type="submit">Login</button>
@@ -93,12 +102,14 @@
             });
 
             axios.post('/api/login', params)
-                .then(function(response) {
-                    window.location.href = '/';
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
+            .then(function(response) {
+                window.location.href = '/';
+            })
+            .catch(function(error) {
+                if (error.response.status === 401) {
+                    document.querySelector('#error-message').innerText = 'Incorrect username/password combo';
+                }
+            });
         });
     </script>
 </body>
