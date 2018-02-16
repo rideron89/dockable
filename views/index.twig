@@ -230,11 +230,13 @@
             });
         });
 
-        // Modal close icon
-        document.querySelector('.close-modal').addEventListener('click', function(ev) {
-            ev.preventDefault();
+        // Modal close icons
+        Array.prototype.slice.call(document.querySelectorAll('.close-modal')).forEach(function($modal) {
+            $modal.addEventListener('click', function(ev) {
+                ev.preventDefault();
 
-            ev.currentTarget.parentNode.parentNode.classList.remove('shown');
+                ev.currentTarget.parentNode.parentNode.classList.remove('shown');
+            });
         });
 
         document.querySelector('#edit-user-form').addEventListener('submit', function(ev) {
@@ -249,7 +251,7 @@
             });
 
             axios.put(`/api/user/${user_id}`, params).then(function(response) {
-                window.location.href = window.location.href
+                window.location.reload();
             });
         });
     </script>
