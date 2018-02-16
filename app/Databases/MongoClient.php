@@ -103,6 +103,33 @@ class MongoClient extends Client
     }
 
     /**
+    * Find a single row for a given filter configuration.
+    *
+    * @param array $filter
+    * @param array $options
+    *
+    * @return App\Databases\Result
+    */
+    public function findOne($filter = [], $options = [])
+    {
+        $documents = [];
+
+        try {
+            $connection = $this->_connect();
+
+            $query = new Query($filter, $options);
+            $cursor = $connection->executeQuery($this->collectionString, $query);
+
+            foreach ($cursor as $doc) {
+                array_push($documents, (array)$doc);
+            }
+
+            return new DatabaseResult($documents[0]);
+        } catch (MongoException $e) {
+            return new DatabaseResult(null, $e->getMessage());
+        }
+
+    /**
     * Create a document from POST data.
     *
     * @param array $document
