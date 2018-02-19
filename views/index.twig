@@ -100,6 +100,7 @@
     </div>
 
     <div id="edit-user-modal" class="modal">
+        <div class="background"></div>
         <div class="inner">
             <a href="#" class="close-modal"><i class="material-icons">close</i></a>
 
@@ -215,6 +216,15 @@
             ev.preventDefault();
 
             ev.currentTarget.parentNode.parentNode.classList.remove('shown');
+        });
+    });
+
+    // Modal backgrounds
+    Array.prototype.slice.call(document.querySelectorAll('.modal .background')).forEach(function($modal) {
+        $modal.addEventListener('click', function(ev) {
+            ev.preventDefault();
+
+            ev.currentTarget.parentNode.classList.remove('shown');
         });
     });
 
