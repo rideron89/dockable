@@ -22,14 +22,14 @@ class TokenController
             return new Response('Bad Request', Response::HTTP_BAD_REQUEST);
         }
 
-        $client = new MongoClient('dockable', 'auth_tokens');
+        $client = new MongoClient('auth_tokens');
         $token = $client->findOne(['_id' => new ObjectId($token_id)])->data;
 
         // delete the token
         $client->delete(['_id' => new ObjectId($token_id)]);
 
         // delete the token from the user's document
-        $client = new MongoClient('dockable', 'users');
+        $client = new MongoClient('users');
 
         $user = $client->findOne(['_id' => $token['user']->_id])->data;
 

@@ -18,7 +18,7 @@ class AuthController
         $password = trim($request->request->get('password'));
 
         // get the user
-        $client = new MongoClient('dockable', 'users');
+        $client = new MongoClient('users');
         $user = $client->find(['username' => $username]);
 
         // test the user credentials
@@ -37,11 +37,11 @@ class AuthController
         ];
 
         // add a new entry to the token database
-        $client = new MongoClient('dockable', 'auth_tokens');
+        $client = new MongoClient('auth_tokens');
         $result = $client->create($document);
 
         // add the token id to the user's document
-        $client = new MongoClient('dockable', 'users');
+        $client = new MongoClient('users');
         $client->updateImproved([
             '_id' => $user->data[0]['_id']
         ], [
@@ -63,7 +63,7 @@ class AuthController
 
         if ($auth) {
             // remove the token
-            $client = new MongoClient('dockable', 'auth_tokens');
+            $client = new MongoClient('auth_tokens');
             $client->delete(['_id' => new ObjectId($auth['id'])]);
         }
 
@@ -81,7 +81,7 @@ class AuthController
             return new Response('invalid user data', 400);
         }
 
-        $db = new MongoClient('dockable', 'users');
+        $db = new MongoClient('users');
 
         if ($db->exists(['username' => $username])) {
             return new Response('account already exists', 409);

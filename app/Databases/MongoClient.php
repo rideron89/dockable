@@ -22,11 +22,40 @@ class MongoClient extends Client
     */
     private $collectionString;
 
-    public function __construct($databaseName, $collectionName)
+    public function __construct($collectionName)
     {
         parent::__construct();
 
+        $databaseName = getenv('DB_NAME');
+
         $this->collectionString = "{$databaseName}.{$collectionName}";
+    }
+
+    public static function findAs($collection, $model, $filter = [], $options = [])
+    {
+        $database = [
+            'host' => getenv('DB_HOST'),
+            'port' => getenv('DB_PORT'),
+            'name' => getenv('DB_NAME'),
+        ];
+
+        $connection = new MongoDriver("mongodb://$database[host]:$database[port]");
+        $query      = new Query($filter, $options);
+        $cursor     = $connection->executeQuery("$database[name].$collection", $query);
+        $documents  = [];
+
+        foreach ($cursor as $document) {
+            $documents[] = new $model($document);
+        }
+
+        return $documents;
+    }
+
+    public static function findOneAs($collection, $model, $filter = [], $options = [])
+    {
+        $documents = self::findAs($collection, $model, $filter, $options);
+
+        return $documents[0];
     }
 
     /**
