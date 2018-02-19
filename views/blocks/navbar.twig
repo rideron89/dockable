@@ -1,0 +1,13 @@
+<section class="ov-h">
+    <p class="fl-l">Welcome to the dashboard.</p>
+
+    <div class="fl-r">
+        {% if user %}
+        <a href="/logout" class="button" id="logout"><i class="material-icons">exit_to_app</i> Logout</a>
+        {% else %}
+        <a href="/login" class="button" id="login-button"><i class="material-icons">person</i>Login</a>
+        {% endif %}
+    </div>
+</section>
+
+<hr />

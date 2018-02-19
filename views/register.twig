@@ -1,66 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+{% extends '_base.twig' %}
 
-    <title>Dockable</title>
+{% block body %}
+<main class="container">
+    <h1>Dockable - Register</h1>
 
-    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <div class="box">
+        <form id="register-form">
+            <fieldset>
+                <label for="username">Username</label>
+                <input id="username" type="text" />
+            </fieldset>
 
-    <link rel="stylesheet" href="/dist/main.css" />
-</head>
-<body>
+            <fieldset>
+                <label for="password">Password</label>
+                <input id="password" type="password" />
+            </fieldset>
 
-    <main class="container">
-        <h1>Dockable - Register</h1>
+            <div>
+                <div id="error-message"></div>
+            </div>
 
-        <div class="box">
-            <form id="register-form">
-                <fieldset>
-                    <label for="username">Username</label>
-                    <input id="username" type="text" />
-                </fieldset>
+            <fieldset>
+                <button type="submit">Register</button>
 
-                <fieldset>
-                    <label for="password">Password</label>
-                    <input id="password" type="password" />
-                </fieldset>
+                <a class="ml-2" href="/login">Login</a>
+            </fieldset>
+        </form>
+    </div>
+</main>
+{% endblock %}
 
-                <div>
-                    <div id="error-message"></div>
-                </div>
+{% block body_scripts %}
+<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script>
+    document.querySelector('#register-form').addEventListener('submit', function(ev) {
+        ev.preventDefault();
 
-                <fieldset>
-                    <button type="submit">Register</button>
+        let fields = Array.prototype.slice.call(ev.target.querySelectorAll('input'));
+        let params = new URLSearchParams();
 
-                    <a class="ml-2" href="/login">Login</a>
-                </fieldset>
-            </form>
-        </div>
-    </main>
-
-    <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
-    <script>
-        document.querySelector('#register-form').addEventListener('submit', function(ev) {
-            ev.preventDefault();
-
-            let fields = Array.prototype.slice.call(ev.target.querySelectorAll('input'));
-            let params = new URLSearchParams();
-
-            fields.map(function(field) {
-                params.append(field.id, field.value);
-            });
-
-            axios.post('/api/register', params)
-            .then(function(response) {
-                window.location.href = '/';
-            })
-            .catch(function(error) {
-                ev.target.querySelector('#error-message').innerHTML = error.response.data;
-            });
+        fields.map(function(field) {
+            params.append(field.id, field.value);
         });
-    </script>
-</body>
-</html>
+
+        axios.post('/api/register', params)
+        .then(function(response) {
+            window.location.href = '/';
+        })
+        .catch(function(error) {
+            ev.target.querySelector('#error-message').innerHTML = error.response.data;
+        });
+    });
+</script>
+{% endblock %}
