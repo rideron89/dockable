@@ -7,7 +7,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Application
+class AppKernel
 {
     public static function start()
     {
