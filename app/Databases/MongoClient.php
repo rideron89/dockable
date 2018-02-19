@@ -4,8 +4,6 @@ namespace App\Databases;
 
 use App\Response;
 
-use App\Databases\Result as DatabaseResult;
-
 use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Manager as MongoDriver;
 use MongoDB\Driver\Query;
@@ -20,87 +18,23 @@ class MongoClient extends Client
     *
     * @var string
     */
-    private $collectionString;
+    private $collection;
 
-    public function __construct($collectionName)
+    private $driver;
+
+    public function __construct($collection)
     {
         parent::__construct();
 
-        $databaseName = getenv('DB_NAME');
-
-        $this->collectionString = "{$databaseName}.{$collectionName}";
-    }
-
-    public static function findAs($collection, $model, $filter = [], $options = [])
-    {
         $database = [
             'host' => getenv('DB_HOST'),
             'port' => getenv('DB_PORT'),
             'name' => getenv('DB_NAME'),
         ];
 
-        $connection = new MongoDriver("mongodb://$database[host]:$database[port]");
-        $query      = new Query($filter, $options);
-        $cursor     = $connection->executeQuery("$database[name].$collection", $query);
-        $documents  = [];
+        $this->collection = "$database[name].$collection";
 
-        foreach ($cursor as $document) {
-            $documents[] = new $model($document);
-        }
-
-        return $documents;
-    }
-
-    public static function findOneAs($collection, $model, $filter = [], $options = [])
-    {
-        $documents = self::findAs($collection, $model, $filter, $options);
-
-        return $documents[0];
-    }
-
-    /**
-    * Try to connect to the Mongo database, and return the connection
-    * instance.
-    *
-    * @return MongoDB\Driver\Manager
-    */
-    private function _connect()
-    {
-        $connection = new MongoDriver('mongodb://' . $this->dbHost . ':' . $this->dbPort);
-
-        return $connection;
-    }
-
-    /**
-    * Check to see if something exists in the databse. Does not return that
-    * document.
-    *
-    * TODO should probably not just return TRUE on error.
-    *
-    * @param array $filter
-    * @param array $options
-    *
-    * @return bool
-    */
-    public function exists($filter = [], $options = [])
-    {
-        $documents = [];
-
-        try {
-            $connection = $this->_connect();
-
-            $query = new Query($filter, $options);
-            $cursor = $connection->executeQuery($this->collectionString, $query);
-
-            foreach ($cursor as $doc)
-            {
-                array_push($documents, (array)$doc);
-            }
-
-            return count($documents) > 0;
-        } catch (MongoException $e) {
-            return true;
-        }
+        $this->driver = new MongoDriver("mongodb://$database[host]:$database[port]");
     }
 
     /**
@@ -111,27 +45,17 @@ class MongoClient extends Client
     *
     * @return App\Databases\Result
     */
-    public function find($filter = [], $options = [])
+    public function find($model, $filter = [], $options = [])
     {
-        $documents = [];
-        $result = new DatabaseResult();
+        $query      = new Query($filter, $options);
+        $cursor     = $this->driver->executeQuery($this->collection, $query);
+        $documents  = [];
 
-        try {
-            $connection = $this->_connect();
-
-            $query = new Query($filter, $options);
-            $cursor = $connection->executeQuery($this->collectionString, $query);
-
-            foreach ($cursor as $doc) {
-                array_push($documents, (array)$doc);
-            }
-
-            $result->data = $documents;
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
+        foreach ($cursor as $doc) {
+            $documents[] = new $model($doc);
         }
 
-        return $result;
+        return $documents;
     }
 
     /**
@@ -142,27 +66,13 @@ class MongoClient extends Client
     *
     * @return App\Databases\Result
     */
-    public function findOne($filter = [], $options = [])
+    public function findOne($model, $filter = [], $options = [])
     {
-        $documents = [];
-        $result = new DatabaseResult();
+        $query      = new Query($filter, $options);
+        $cursor     = $this->driver->executeQuery($this->collection, $query);
+        $documents  = [];
 
-        try {
-            $connection = $this->_connect();
-
-            $query = new Query($filter, $options);
-            $cursor = $connection->executeQuery($this->collectionString, $query);
-
-            foreach ($cursor as $doc) {
-                array_push($documents, (array)$doc);
-            }
-
-            $result->data = $documents[0];
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
-        }
-
-        return $result;
+        return $cursor->toArray()[0];
     }
 
     /**
@@ -174,28 +84,17 @@ class MongoClient extends Client
     */
     public function create($document)
     {
-        $result = new DatabaseResult();
+        $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
-        try {
-            $connection = $this->_connect();
-            $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
+        $bulk = new BulkWrite();
+        $newId = $bulk->insert($document);
 
-            $bulk = new BulkWrite();
-            $newId = $bulk->insert($document);
+        $this->driver->executeBulkWrite($this->collection, $bulk, $writeConcern);
 
-            $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
+        $newDocument = $document;
+        $newDocument['_id'] = $newId;
 
-            $newDocument = $document;
-            $newDocument['_id'] = $newId;
-
-            $result->data = $newDocument;
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
-        } catch (BulkWriteException $e) {
-            $result->err = $e->getMessage();
-        }
-
-        return $result;
+        return $newDocument;
     }
 
     /**
@@ -208,48 +107,14 @@ class MongoClient extends Client
     */
     public function update($filter, $document)
     {
-        $result = new DatabaseResult();
+        $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
-        try {
-            $connection = $this->_connect();
-            $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
+        $bulk = new BulkWrite();
+        $bulk->update($filter, ['$set' => $document]);
 
-            $bulk = new BulkWrite();
-            $bulk->update($filter, ['$set' => $document]);
+        $this->driver->executeBulkWrite($this->collection, $bulk, $writeConcern);
 
-            $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
-
-            $result->data = $document;
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
-        } catch (BulkWriteException $e) {
-            $result->err = $e->getMessage();
-        }
-
-        return $result;
-    }
-
-    public function updateImproved($filter, $rules)
-    {
-        $result = new DatabaseResult();
-
-        try {
-            $connection = $this->_connect();
-            $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
-
-            $bulk = new BulkWrite();
-            $bulk->update($filter, $rules);
-
-            $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
-
-            $result->data = $document;
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
-        } catch (BulkWriteException $e) {
-            $result->err = $e->getMessage();
-        }
-
-        return $result;
+        return $document;
     }
 
     /**
@@ -261,24 +126,13 @@ class MongoClient extends Client
     */
     public function delete($filter)
     {
-        $result = new DatabaseResult();
+        $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
 
-        try {
-            $connection = $this->_connect();
-            $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
+        $bulk = new BulkWrite();
+        $bulk->delete($filter);
 
-            $bulk = new BulkWrite();
-            $bulk->delete($filter);
+        $this->driver->executeBulkWrite($this->collection, $bulk, $writeConcern);
 
-            $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
-
-            $result->data = $filter;
-        } catch (MongoException $e) {
-            $result->err = $e->getMessage();
-        } catch (BulkWriteException $e) {
-            $result->err = $e->getMessage();
-        }
-
-        return $result;
+        return $filter;
     }
 }

@@ -17,16 +17,19 @@ class HomeController
     {
         $auth_token = $request->auth_token;
 
-        if ($auth_token->user) {
-            $user = MongoClient::findOneAs('users', User::class, ['_id' => $auth_token->user->_id]);
-        } else {
-            $user = new User();
-        }
+        // get all tokens
+        $client = new MongoClient('auth_tokens');
+        $tokens = $client->find(Token::class);
 
-        $tokens = MongoClient::findAs('auth_tokens', Token::class);
-        $users  = MongoClient::findAs('users', User::class, [], ['projection' => ['password' => 0]]);
+        // get all users
+        $client = new MongoClient('users');
+        $users = $client->find(User::class, [], ['projection' => ['password' => 0]]);
 
-        $html = Viewer::renderTwig('index.twig', ['user' => $user, 'tokens' => $tokens, 'users' => $users]);
+        // get the authorized user if there is one
+        $user = (!$auth_token->user) ? [] : $client->findOne(User::class, ['_id' => $auth_token->user->_id]);
+
+        $data = ['user' => $user, 'tokens' => $tokens, 'users' => $users];
+        $html = Viewer::renderTwig('index.twig', $data);
 
         return new Response($html);
     }

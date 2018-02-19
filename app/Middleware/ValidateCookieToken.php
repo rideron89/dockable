@@ -25,7 +25,8 @@ class ValidateCookieToken implements Middleware
 
         $cookie_token->_id = new ObjectId($cookie_token->_id['$oid']);
 
-        $database_token = MongoClient::findOneAs('auth_tokens', Token::class, ['_id' => $cookie_token->_id]);
+        $client = new MongoClient('auth_tokens');
+        $database_token = $client->findOne(Token::class, ['_id' => $cookie_token->_id]);
 
         // check if token does not exist or is expired
         if (!$database_token) {

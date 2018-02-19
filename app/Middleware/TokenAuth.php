@@ -22,7 +22,7 @@ class TokenAuth implements Middleware
         }
 
         $client = new MongoClient('dockable', 'auth_tokens');
-        $token = $client->find(['_id' => new ObjectId($auth['id'])]);
+        $token = $client->find(['_id' => new ObjectId($auth['_id']['$oid'])]);
 
         // check for token not found
         if (!$token || $token->err) {
@@ -30,8 +30,8 @@ class TokenAuth implements Middleware
         }
 
         // check expration date
-        if (time() >= $token->data[0]['expires_date']) {
-            return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        if (time() >= $token->data[0]->expires_date) {
+            return new Response(json_encode($token), Response::HTTP_UNAUTHORIZED);
         }
 
         return $request;
