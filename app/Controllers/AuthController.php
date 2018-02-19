@@ -29,7 +29,7 @@ class AuthController
         // set up the token object
         $document = [
             'user'    => [
-                'id'      => $user->data[0]['_id']->__toString(),
+                '_id'      => $user->data[0]['_id'],
                 'username' => $user->data[0]['username'],
             ],
             'token'   => bin2hex(random_bytes(16)),
@@ -39,6 +39,14 @@ class AuthController
         // add a new entry to the token database
         $client = new MongoClient('dockable', 'auth_tokens');
         $result = $client->create($document);
+
+        // add the token id to the user's document
+        $client = new MongoClient('dockable', 'users');
+        $client->updateImproved([
+            '_id' => $user->data[0]['_id']
+        ], [
+            '$push' => ['tokens' => $document['token']]
+        ]);
 
         // save the token data in a cookie for future requests
         $auth = base64_encode(json_encode($result->data));

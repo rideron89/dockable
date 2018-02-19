@@ -200,6 +200,29 @@ class MongoClient extends Client
         return $result;
     }
 
+    public function updateImproved($filter, $rules)
+    {
+        $result = new DatabaseResult();
+
+        try {
+            $connection = $this->_connect();
+            $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
+
+            $bulk = new BulkWrite();
+            $bulk->update($filter, $rules);
+
+            $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
+
+            $result->data = $document;
+        } catch (MongoException $e) {
+            $result->err = $e->getMessage();
+        } catch (BulkWriteException $e) {
+            $result->err = $e->getMessage();
+        }
+
+        return $result;
+    }
+
     /**
     * Delete documents based on a filter.
     *

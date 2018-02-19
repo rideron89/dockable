@@ -23,7 +23,25 @@ class TokenController
         }
 
         $client = new MongoClient('dockable', 'auth_tokens');
+        $token = $client->findOne(['_id' => new ObjectId($token_id)])->data;
+
+        // delete the token
         $client->delete(['_id' => new ObjectId($token_id)]);
+
+        // delete the token from the user's document
+        $client = new MongoClient('dockable', 'users');
+
+        $user = $client->findOne(['_id' => $token['user']->_id])->data;
+
+        $new_tokens = array_filter($user['tokens'], function ($user_token) use ($token) {
+            return $user_token != $token['token'];
+        });
+
+        if ($user_tokens == []) {
+            $client->updateImproved(['_id' => $user['_id']], ['$unset' => ['tokens' => '']]);
+        } else {
+            $client->update(['_id' => $user['_id']], ['tokens' => $user_tokens]);
+        }
 
         if ($client->err) {
             return new Response($client->err, Response::HTTP_INTERNAL_SERVER_ERROR);
