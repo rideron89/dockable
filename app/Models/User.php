@@ -5,10 +5,10 @@ namespace App\Models;
 class User extends Model
 {
     protected $fields = [
-        '_id',
-        'email',
-        'username',
-        'password',
-        'tokens',
+        '_id'      => 'string',
+        'email'    => 'string',
+        'username' => 'string',
+        'password' => 'string',
+        'tokens'   => 'string',
     ];
 }

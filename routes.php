@@ -7,7 +7,7 @@ use App\Routing\Router;
  |    Front-end end-points
  |
  *------------------------------------------------------------*/
-Router::get('/',         'HomeController@index');
+Router::get('/',         'HomeController@index')->middleware('ValidateCookieToken');
 Router::get('/login',    'HomeController@login');
 Router::get('/register', 'HomeController@register');
 

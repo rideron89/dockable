@@ -186,7 +186,7 @@ class MongoClient extends Client
             $connection->executeBulkWrite($this->collectionString, $bulk, $writeConcern);
 
             $newDocument = $document;
-            $newDocument['id'] = $newId->jsonSerialize()['$oid'];
+            $newDocument['_id'] = $newId;
 
             $result->data = $newDocument;
         } catch (MongoException $e) {

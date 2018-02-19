@@ -13,8 +13,14 @@ class Model
     */
     public function __construct($document = [])
     {
-        foreach ($this->fields as $field) {
-            $this->$field = (is_array($document)) ? $document[$field] : $document->$field;
+        foreach ($this->fields as $field => $type) {
+            $prop = (is_array($document)) ? $document[$field] : $document->$field;
+
+            if (class_exists($type)) {
+                $this->$field = new $type($prop);
+            } else {
+                $this->$field = $prop;
+            }
         }
     }
 }
